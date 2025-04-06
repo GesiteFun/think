@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Notepad</title>
+    <title>Modern Notepad Pro</title>
     <style>
         :root {
             --bg-color: #ffffff;
@@ -12,6 +12,8 @@
             --secondary-color: #f5f5f5;
             --gradient-start: #2196f3;
             --gradient-end: #e91e63;
+            --toast-bg: #4caf50;
+            --error-bg: #f44336;
         }
 
         .dark-mode {
@@ -20,6 +22,8 @@
             --secondary-color: #2d2d2d;
             --gradient-start: #673ab7;
             --gradient-end: #2196f3;
+            --toast-bg: #2e7d32;
+            --error-bg: #c62828;
         }
 
         * {
@@ -112,6 +116,34 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 15px 25px;
+            background-color: var(--toast-bg);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background-color: var(--error-bg);
         }
 
         @media (max-width: 768px) {
@@ -126,6 +158,20 @@
             .btn {
                 flex-grow: 1;
                 justify-content: center;
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .editor {
+                min-height: 50vh;
+                font-size: 1rem;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn span {
+                display: none;
             }
         }
     </style>
@@ -133,39 +179,57 @@
 <body>
     <div class="container">
         <div class="header">
-            <input type="text" class="note-title" id="noteTitle" placeholder="Judul Catatan">
+            <input type="text" class="note-title" id="noteTitle" placeholder="Judul Catatan" aria-label="Judul catatan">
             <div class="toolbar">
-                <button class="btn" onclick="saveNote()">
+                <button class="btn" onclick="saveNote()" aria-label="Simpan catatan">
                     <span>💾</span> Simpan (Ctrl+S)
                 </button>
-                <button class="btn" onclick="newNote()">
+                <button class="btn" onclick="newNote()" aria-label="Catatan baru">
                     <span>📄</span> Baru (Ctrl+N)
                 </button>
-                <button class="btn" onclick="downloadNote()">
+                <button class="btn" onclick="downloadNote()" aria-label="Download catatan">
                     <span>📥</span> Download
                 </button>
-                <label class="btn">
+                <label class="btn" aria-label="Upload file teks">
                     <span>📤</span> Upload
                     <input type="file" hidden accept=".txt" onchange="uploadNote(event)">
                 </label>
             </div>
         </div>
-        <textarea class="editor" id="editor" placeholder="Ketik catatan Anda di sini..."></textarea>
-        <button class="btn" id="theme-toggle" onclick="toggleTheme()">🌓</button>
+        <textarea class="editor" id="editor" placeholder="Ketik catatan Anda di sini... Tekan Ctrl+S untuk menyimpan" aria-label="Editor catatan"></textarea>
+        <button class="btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle tema gelap/terang">🌙</button>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
+        // DOM Elements
+        const noteTitle = document.getElementById('noteTitle');
+        const editor = document.getElementById('editor');
+        const themeToggle = document.getElementById('theme-toggle');
+        const toast = document.getElementById('toast');
+
         // Load saved note
         window.addEventListener('DOMContentLoaded', () => {
             const savedNote = localStorage.getItem('note');
             if (savedNote) {
-                const { title, content } = JSON.parse(savedNote);
-                document.getElementById('noteTitle').value = title;
-                document.getElementById('editor').value = content;
+                try {
+                    const { title, content } = JSON.parse(savedNote);
+                    noteTitle.value = title;
+                    editor.value = content;
+                } catch (e) {
+                    showToast('Gagal memuat catatan', true);
+                }
             }
             
+            // Load theme preference
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark-mode') document.body.classList.add('dark-mode');
+            if (savedTheme === 'dark-mode') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+            } else {
+                themeToggle.textContent = '🌙';
+            }
         });
 
         // Auto-save every 3 seconds
@@ -173,10 +237,20 @@
             if (validateTitle()) saveToStorage();
         }, 3000);
 
+        // Show toast notification
+        function showToast(message, isError = false) {
+            toast.textContent = message;
+            toast.className = isError ? 'toast error show' : 'toast show';
+            
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
         function validateTitle() {
-            const title = document.getElementById('noteTitle').value.trim();
+            const title = noteTitle.value.trim();
             if (!title) {
-                alert('Judul catatan tidak boleh kosong!');
+                showToast('Judul catatan tidak boleh kosong!', true);
                 return false;
             }
             return true;
@@ -185,29 +259,30 @@
         function saveNote() {
             if (!validateTitle()) return;
             saveToStorage();
-            alert('Catatan tersimpan!');
+            showToast('Catatan tersimpan!');
         }
 
         function saveToStorage() {
             const note = {
-                title: document.getElementById('noteTitle').value,
-                content: document.getElementById('editor').value
+                title: noteTitle.value,
+                content: editor.value
             };
             localStorage.setItem('note', JSON.stringify(note));
         }
 
         function newNote() {
             if (confirm('Apakah Anda ingin membuat catatan baru? Perubahan yang belum disimpan akan hilang.')) {
-                document.getElementById('noteTitle').value = '';
-                document.getElementById('editor').value = '';
+                noteTitle.value = '';
+                editor.value = '';
                 localStorage.removeItem('note');
+                showToast('Catatan baru dibuat');
             }
         }
 
         function downloadNote() {
             if (!validateTitle()) return;
-            const text = document.getElementById('editor').value;
-            const title = document.getElementById('noteTitle').value.trim() || 'catatan';
+            const text = editor.value;
+            const title = noteTitle.value.trim() || 'catatan';
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -215,23 +290,36 @@
             a.download = `${title}.txt`;
             a.click();
             URL.revokeObjectURL(url);
+            showToast('Catatan berhasil diunduh');
         }
 
         function uploadNote(event) {
             const file = event.target.files[0];
-            if (file && file.type === 'text/plain') {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    document.getElementById('editor').value = e.target.result;
-                    saveToStorage();
-                };
-                reader.readAsText(file);
+            if (!file) return;
+            
+            if (file.type !== 'text/plain' && !file.name.endsWith('.txt')) {
+                showToast('Hanya file .txt yang didukung', true);
+                return;
             }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                editor.value = e.target.result;
+                noteTitle.value = file.name.replace('.txt', '');
+                saveToStorage();
+                showToast('File berhasil diunggah');
+            };
+            reader.onerror = () => {
+                showToast('Gagal membaca file', true);
+            };
+            reader.readAsText(file);
         }
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDarkMode ? 'dark-mode' : 'light-mode');
         }
 
         // Keyboard shortcuts
@@ -246,15 +334,15 @@
                         e.preventDefault();
                         newNote();
                         break;
-                    case 'z':
-                        document.execCommand('undo');
-                        break;
-                    case 'y':
-                        document.execCommand('redo');
-                        break;
                 }
             }
         });
+
+        // Improved data structure for future multi-note support
+        function getNotesArray() {
+            const notes = localStorage.getItem('notes');
+            return notes ? JSON.parse(notes) : [];
+        }
     </script>
 </body>
 </html>
