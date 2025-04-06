@@ -1,272 +1,895 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Notepad Pro</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg-color: #f9f9f9;
-      --text-color: #333;
-      --primary-color: #4a90e2;
-      --secondary-color: #fff;
-      --border-color: #e0e0e0;
-    }
-    .dark-mode {
-      --bg-color: #1a1a1a;
-      --text-color: #f0f0f0;
-      --secondary-color: #2d2d2d;
-      --border-color: #444;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      transition: all 0.3s ease;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      min-height: 100vh;
-    }
-    .sidebar {
-      width: 260px;
-      background-color: var(--secondary-color);
-      border-right: 1px solid var(--border-color);
-      padding: 20px;
-      overflow-y: auto;
-      transition: transform 0.3s ease;
-    }
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
-    .sidebar h2 {
-      margin-bottom: 10px;
-      font-size: 1.2rem;
-    }
-    .note-history {
-      list-style: none;
-    }
-    .note-history li {
-      margin: 6px 0;
-      padding: 8px;
-      border-radius: 6px;
-      background: var(--bg-color);
-      cursor: pointer;
-    }
-    .note-history li:hover {
-      background-color: var(--primary-color);
-      color: #fff;
-    }
-    .main {
-      flex: 1;
-      padding: 24px;
-    }
-    .toggle-sidebar {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 10px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      z-index: 1000;
-    }
-    .header {
-      background: var(--primary-color);
-      color: white;
-      padding: 16px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-    }
-    .note-title {
-      width: 100%;
-      font-size: 1.2rem;
-      padding: 12px;
-      margin-bottom: 10px;
-      border: none;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-    }
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      padding: 10px 14px;
-      border: none;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-    .editor {
-      width: 100%;
-      min-height: 60vh;
-      margin-top: 16px;
-      padding: 16px;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      background: var(--secondary-color);
-      color: var(--text-color);
-      font-size: 1rem;
-      resize: vertical;
-    }
-    #theme-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      font-size: 1.1rem;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✍️ Notepad Pro with Sidebar</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f9f9f9;
+            --text-color: #333333;
+            --primary-color: #4a90e2;
+            --secondary-color: #ffffff;
+            --gradient-start: #6c63ff;
+            --gradient-end: #4a90e2;
+            --toast-bg: #4caf50;
+            --error-bg: #f44336;
+            --border-color: #e0e0e0;
+            --placeholder-color: #aaaaaa;
+            --sidebar-width: 250px;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #333333;
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --secondary-color: #2d2d2d;
+            --gradient-start: #6c63ff;
+            --gradient-end: #4a90e2;
+            --toast-bg: #2e7d32;
+            --error-bg: #c62828;
+            --border-color: #444444;
+            --placeholder-color: #666666;
+            --sidebar-bg: #2d2d2d;
+            --sidebar-text: #f0f0f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            left: 0;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 60px;
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.2s ease;
+        }
+
+        .sidebar.collapsed .sidebar-title {
+            opacity: 0;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .note-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+            margin: 0 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        .note-item:hover {
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+
+        .note-item.active {
+            background-color: rgba(74, 144, 226, 0.2);
+            font-weight: 500;
+        }
+
+        .note-item .note-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-item .note-date {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+
+        .note-item .delete-btn {
+            color: var(--error-bg);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            padding: 5px;
+            margin-left: 5px;
+        }
+
+        .note-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .sidebar.collapsed .note-item {
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .sidebar.collapsed .note-title,
+        .sidebar.collapsed .note-date,
+        .sidebar.collapsed .delete-btn {
+            display: none;
+        }
+
+        .add-note-btn {
+            padding: 12px 15px;
+            margin: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .add-note-btn:hover {
+            background-color: #3a7bc8;
+        }
+
+        .sidebar.collapsed .add-note-btn {
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .sidebar.collapsed .add-note-btn span {
+            display: none;
+        }
+
+        /* Toggle Button */
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-btn:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed + .main-content {
+            margin-left: -190px;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-title-input {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.4rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .note-title-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn i {
+            margin-right: 6px;
+            font-size: 0.9em;
+        }
+
+        .editor {
+            width: 100%;
+            min-height: 70vh;
+            padding: 22px;
+            font-size: 1.05rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            resize: vertical;
+            line-height: 1.7;
+        }
+
+        .editor:focus {
+            outline: 2px solid var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
+        }
+
+        .editor::placeholder {
+            color: var(--placeholder-color);
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        #theme-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 14px 24px;
+            background-color: var(--toast-bg);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background-color: var(--error-bg);
+        }
+
+        .save-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 12px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .save-status.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                z-index: 1000;
+                height: 100vh;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.show-mobile {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            .mobile-menu-btn {
+                display: block !important;
+            }
+
+            .container {
+                padding: 15px;
+            }
+            
+            .note-title-input {
+                font-size: 1.2rem;
+                padding: 12px;
+            }
+            
+            .btn {
+                flex-grow: 1;
+                justify-content: center;
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .editor {
+                min-height: 60vh;
+                font-size: 1rem;
+                padding: 18px;
+            }
+
+            .save-status {
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn-text {
+                display: none;
+            }
+            
+            .btn i {
+                margin-right: 0;
+                font-size: 1em;
+            }
+            
+            #theme-toggle {
+                width: 44px;
+                height: 44px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
-  <button class="toggle-sidebar" onclick="toggleSidebar()">
-    <i class="fas fa-bars"></i>
-  </button>
+    <!-- Mobile Menu Button (hidden on desktop) -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+    </button>
 
-  <aside class="sidebar" id="sidebar">
-    <h2>Catatan Saya</h2>
-    <ul class="note-history" id="historyList"></ul>
-  </aside>
-
-  <main class="main">
-    <div class="header">
-      <input type="text" class="note-title" id="noteTitle" placeholder="Judul Catatan" />
-      <div class="toolbar">
-        <button class="btn" onclick="saveNote()">
-          <i class="fas fa-save"></i> Simpan
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Catatan Saya</div>
+            <button class="toggle-btn" id="toggleBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-content" id="notesList">
+            <!-- Notes will be listed here -->
+        </div>
+        
+        <button class="add-note-btn" id="addNoteBtn">
+            <i class="fas fa-plus"></i>
+            <span>Catatan Baru</span>
         </button>
-        <button class="btn" onclick="newNote()">
-          <i class="fas fa-file-alt"></i> Baru
-        </button>
-        <button class="btn" onclick="downloadNote()">
-          <i class="fas fa-download"></i> Download
-        </button>
-        <label class="btn">
-          <i class="fas fa-upload"></i> Upload
-          <input type="file" hidden accept=".txt" onchange="uploadNote(event)" />
-        </label>
-      </div>
     </div>
-    <textarea id="editor" class="editor" placeholder="Tulis catatan kamu di sini..."></textarea>
-  </main>
 
-  <button id="theme-toggle" onclick="toggleTheme()">
-    <i class="fas fa-moon"></i>
-  </button>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <div class="header">
+                <input type="text" class="note-title-input" id="noteTitle" placeholder="Beri judul catatan Anda..." aria-label="Judul catatan">
+                <div class="toolbar">
+                    <button class="btn" onclick="saveNote()" aria-label="Simpan catatan">
+                        <i class="fas fa-save"></i>
+                        <span class="btn-text">Simpan (Ctrl+S)</span>
+                    </button>
+                    <button class="btn" onclick="downloadNote()" aria-label="Download catatan">
+                        <i class="fas fa-download"></i>
+                        <span class="btn-text">Download</span>
+                    </button>
+                    <label class="btn" aria-label="Upload file teks">
+                        <i class="fas fa-upload"></i>
+                        <span class="btn-text">Upload</span>
+                        <input type="file" hidden accept=".txt" onchange="uploadNote(event)">
+                    </label>
+                </div>
+            </div>
+            <textarea class="editor" id="editor" placeholder="Mulai mengetik di sini... ✨\n\nTips:\n- Gunakan Ctrl+S untuk menyimpan\n- Klik ikon bulan untuk tema gelap\n- Drag sudut textarea untuk mengubah ukuran" aria-label="Editor catatan"></textarea>
+            <button class="btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle tema gelap/terang">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </div>
 
-  <script>
-    const sidebar = document.getElementById('sidebar');
-    const themeToggle = document.getElementById('theme-toggle');
-    const noteTitle = document.getElementById('noteTitle');
-    const editor = document.getElementById('editor');
-    const historyList = document.getElementById('historyList');
+    <div class="toast" id="toast"></div>
+    <div class="save-status" id="saveStatus">
+        <i class="fas fa-circle-notch fa-spin"></i>
+        <span>Menyimpan...</span>
+    </div>
 
-    function toggleSidebar() {
-      sidebar.classList.toggle('hidden');
-    }
+    <script>
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const notesList = document.getElementById('notesList');
+        const addNoteBtn = document.getElementById('addNoteBtn');
+        const noteTitle = document.getElementById('noteTitle');
+        const editor = document.getElementById('editor');
+        const themeToggle = document.getElementById('theme-toggle');
+        const toast = document.getElementById('toast');
+        const saveStatus = document.getElementById('saveStatus');
+        
+        let notes = [];
+        let currentNoteId = null;
+        let typingTimer;
 
-    function toggleTheme() {
-      document.body.classList.toggle('dark-mode');
-      const icon = themeToggle.querySelector('i');
-      icon.classList.toggle('fa-moon');
-      icon.classList.toggle('fa-sun');
-      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode');
-    }
+        // Initialize the app
+        function init() {
+            loadNotes();
+            setupEventListeners();
+            updateDocumentTitle();
+            
+            // Load theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark-mode') {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            
+            // Check mobile view
+            checkMobileView();
+        }
 
-    function saveNote() {
-      if (!noteTitle.value.trim()) return alert("Judul tidak boleh kosong!");
-      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-      const id = Date.now();
-      notes.push({ id, title: noteTitle.value, content: editor.value });
-      localStorage.setItem('notes', JSON.stringify(notes));
-      localStorage.setItem('currentNote', id);
-      alert("Catatan disimpan!");
-      loadHistory();
-    }
+        // Load notes from localStorage
+        function loadNotes() {
+            const savedNotes = localStorage.getItem('notes');
+            if (savedNotes) {
+                notes = JSON.parse(savedNotes);
+                renderNotesList();
+                
+                // Load the first note if available
+                if (notes.length > 0) {
+                    loadNote(notes[0].id);
+                } else {
+                    createNewNote();
+                }
+            } else {
+                createNewNote();
+            }
+        }
 
-    function newNote() {
-      if (!confirm("Catatan sekarang akan dihapus jika belum disimpan. Lanjut?")) return;
-      noteTitle.value = "";
-      editor.value = "";
-      localStorage.removeItem('currentNote');
-    }
+        // Render notes list in sidebar
+        function renderNotesList() {
+            notesList.innerHTML = '';
+            
+            notes.forEach(note => {
+                const noteItem = document.createElement('div');
+                noteItem.className = `note-item ${note.id === currentNoteId ? 'active' : ''}`;
+                noteItem.innerHTML = `
+                    <div class="note-title">${note.title || 'Untitled'}</div>
+                    <div class="note-date">${formatDate(note.updatedAt)}</div>
+                    <button class="delete-btn" data-id="${note.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                
+                noteItem.addEventListener('click', () => loadNote(note.id));
+                
+                const deleteBtn = noteItem.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteNote(note.id);
+                });
+                
+                notesList.appendChild(noteItem);
+            });
+        }
 
-    function downloadNote() {
-      const blob = new Blob([editor.value], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `${noteTitle.value || 'catatan'}.txt`;
-      a.click();
-    }
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
 
-    function uploadNote(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        editor.value = e.target.result;
-        noteTitle.value = file.name.replace(".txt", "");
-      };
-      reader.readAsText(file);
-    }
+        // Create a new note
+        function createNewNote() {
+            const newNote = {
+                id: Date.now().toString(),
+                title: '',
+                content: '',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            notes.unshift(newNote);
+            saveNotes();
+            loadNote(newNote.id);
+            renderNotesList();
+            
+            // Focus on title input
+            setTimeout(() => {
+                noteTitle.focus();
+            }, 100);
+        }
 
-    function loadHistory() {
-      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-      historyList.innerHTML = '';
-      notes.reverse().forEach(note => {
-        const li = document.createElement('li');
-        li.textContent = note.title;
-        li.onclick = () => {
-          noteTitle.value = note.title;
-          editor.value = note.content;
-          localStorage.setItem('currentNote', note.id);
-        };
-        historyList.appendChild(li);
-      });
-    }
+        // Load note into editor
+        function loadNote(noteId) {
+            const note = notes.find(n => n.id === noteId);
+            if (note) {
+                currentNoteId = noteId;
+                noteTitle.value = note.title;
+                editor.value = note.content;
+                updateDocumentTitle();
+                renderNotesList();
+            }
+        }
 
-    function loadLastNote() {
-      const id = localStorage.getItem('currentNote');
-      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-      const note = notes.find(n => n.id == id);
-      if (note) {
-        noteTitle.value = note.title;
-        editor.value = note.content;
-      }
-    }
+        // Save current note
+        function saveNote() {
+            if (!currentNoteId) return;
+            
+            const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+            if (noteIndex !== -1) {
+                notes[noteIndex].title = noteTitle.value;
+                notes[noteIndex].content = editor.value;
+                notes[noteIndex].updatedAt = new Date().toISOString();
+                saveNotes();
+                renderNotesList();
+                showToast('Catatan tersimpan!');
+            }
+        }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark-mode') {
-        document.body.classList.add('dark-mode');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-      }
-      loadHistory();
-      loadLastNote();
-    });
-  </script>
+        // Auto-save every 3 seconds
+        function startAutoSave() {
+            setInterval(() => {
+                if (currentNoteId) {
+                    const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+                    if (noteIndex !== -1 && 
+                        (notes[noteIndex].title !== noteTitle.value || 
+                         notes[noteIndex].content !== editor.value)) {
+                        showSavingStatus();
+                        setTimeout(() => {
+                            saveNote();
+                            hideSavingStatus();
+                        }, 500);
+                    }
+                }
+            }, 3000);
+        }
+
+        // Delete a note
+        function deleteNote(noteId) {
+            if (notes.length <= 1) {
+                showToast('Anda harus memiliki setidaknya satu catatan', true);
+                return;
+            }
+            
+            if (confirm('Apakah Anda yakin ingin menghapus catatan ini?')) {
+                notes = notes.filter(note => note.id !== noteId);
+                saveNotes();
+                
+                if (currentNoteId === noteId) {
+                    // Load the first available note after deletion
+                    currentNoteId = notes.length > 0 ? notes[0].id : null;
+                    if (currentNoteId) {
+                        loadNote(currentNoteId);
+                    } else {
+                        createNewNote();
+                    }
+                }
+                
+                renderNotesList();
+                showToast('Catatan dihapus');
+            }
+        }
+
+        // Save all notes to localStorage
+        function saveNotes() {
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
+        // Download current note
+        function downloadNote() {
+            if (!currentNoteId) return;
+            
+            const note = notes.find(n => n.id === currentNoteId);
+            if (note) {
+                const text = note.content;
+                const title = note.title.trim() || 'catatan';
+                const blob = new Blob([text], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${title}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Catatan berhasil diunduh');
+            }
+        }
+
+        // Upload a text file
+        function uploadNote(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.type !== 'text/plain' && !file.name.endsWith('.txt')) {
+                showToast('Hanya file .txt yang didukung', true);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const newNote = {
+                    id: Date.now().toString(),
+                    title: file.name.replace('.txt', ''),
+                    content: e.target.result,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                notes.unshift(newNote);
+                saveNotes();
+                loadNote(newNote.id);
+                renderNotesList();
+                showToast('File berhasil diunggah');
+            };
+            reader.onerror = () => {
+                showToast('Gagal membaca file', true);
+            };
+            reader.readAsText(file);
+        }
+
+        // Toggle sidebar collapse
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('theme', isDarkMode ? 'dark-mode' : 'light-mode');
+            
+            // Add animation to theme toggle
+            themeToggle.style.transform = 'scale(1.1) rotate(360deg)';
+            setTimeout(() => {
+                themeToggle.style.transform = '';
+            }, 500);
+        }
+
+        // Show saving status
+        function showSavingStatus() {
+            saveStatus.classList.add('show');
+        }
+
+        // Hide saving status
+        function hideSavingStatus() {
+            saveStatus.classList.remove('show');
+        }
+
+        // Show toast notification
+        function showToast(message, isError = false) {
+            const icon = isError ? '<i class="fas fa-exclamation-circle"></i>' : '<i class="fas fa-check-circle"></i>';
+            toast.innerHTML = `${icon} <span>${message}</span>`;
+            toast.className = isError ? 'toast error show' : 'toast show';
+            
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        // Update document title
+        function updateDocumentTitle() {
+            if (currentNoteId) {
+                const note = notes.find(n => n.id === currentNoteId);
+                if (note) {
+                    const title = note.title.trim() || 'Untitled Note';
+                    document.title = `${title} ✍️ Notepad Pro`;
+                    return;
+                }
+            }
+            document.title = '✍️ Notepad Pro';
+        }
+
+        // Check if mobile view
+        function checkMobileView() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.add('show-mobile');
+                mobileMenuBtn.style.display = 'flex';
+            } else {
+                sidebar.classList.remove('show-mobile');
+                mobileMenuBtn.style.display = 'none';
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Toggle sidebar
+            toggleBtn.addEventListener('click', toggleSidebar);
+            
+            // Mobile menu button
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('show-mobile');
+            });
+            
+            // Add new note button
+            addNoteBtn.addEventListener('click', createNewNote);
+            
+            // Title and editor input events
+            noteTitle.addEventListener('input', () => {
+                updateDocumentTitle();
+                if (currentNoteId) {
+                    const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+                    if (noteIndex !== -1) {
+                        notes[noteIndex].title = noteTitle.value;
+                        notes[noteIndex].updatedAt = new Date().toISOString();
+                        saveNotes();
+                        renderNotesList();
+                    }
+                }
+            });
+            
+            editor.addEventListener('input', () => {
+                if (currentNoteId) {
+                    const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+                    if (noteIndex !== -1) {
+                        notes[noteIndex].content = editor.value;
+                        notes[noteIndex].updatedAt = new Date().toISOString();
+                        saveNotes();
+                        renderNotesList();
+                    }
+                }
+                
+                // Show saving status
+                showSavingStatus();
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => {
+                    hideSavingStatus();
+                }, 1000);
+            });
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+                    switch (e.key.toLowerCase()) {
+                        case 's':
+                            e.preventDefault();
+                            saveNote();
+                            break;
+                        case 'n':
+                            e.preventDefault();
+                            createNewNote();
+                            break;
+                    }
+                }
+            });
+            
+            // Window resize for mobile view
+            window.addEventListener('resize', checkMobileView);
+        }
+
+        // Initialize the app
+        window.addEventListener('DOMContentLoaded', () => {
+            init();
+            startAutoSave();
+        });
+    </script>
 </body>
 </html>
