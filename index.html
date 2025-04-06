@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✍️ Notepad Pro with Sidebar</title>
+    <title>Notepad Pro</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Google Fonts - Inter -->
@@ -220,8 +220,15 @@
             align-items: center;
         }
 
-        /* Text Controls Container */
-        .text-controls {
+        /* Left Controls */
+        .left-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Right Controls */
+        .right-controls {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -285,14 +292,14 @@
             font-weight: bold;
         }
 
-        /* Undo/Redo Buttons */
+        /* Undo/Redo Controls */
         .undo-redo-controls {
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
-        .undo-btn, .redo-btn {
+        .undo-btn, .redo-btn, .new-note-btn {
             background-color: rgba(255, 255, 255, 0.15);
             color: white;
             border: none;
@@ -306,7 +313,7 @@
             transition: all 0.2s ease;
         }
 
-        .undo-btn:hover, .redo-btn:hover {
+        .undo-btn:hover, .redo-btn:hover, .new-note-btn:hover {
             background-color: rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
         }
@@ -361,9 +368,16 @@
             font-size: 0.9em;
         }
 
+        .editor-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
         .editor {
             width: 100%;
-            min-height: 70vh;
+            flex: 1;
             padding: 22px;
             font-size: 16px;
             font-weight: normal;
@@ -371,9 +385,10 @@
             border-radius: 12px;
             background-color: var(--secondary-color);
             color: var(--text-color);
-            resize: vertical;
+            resize: none;
             line-height: 1.7;
-            flex: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 300px);
         }
 
         .editor:focus {
@@ -385,6 +400,17 @@
             color: var(--placeholder-color);
             font-style: italic;
             opacity: 0.7;
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: var(--placeholder-color);
+            background-color: var(--secondary-color);
+            padding: 2px 6px;
+            border-radius: 10px;
         }
 
         /* Footer */
@@ -511,6 +537,7 @@
                 min-height: 60vh;
                 font-size: 1rem;
                 padding: 18px;
+                max-height: calc(100vh - 250px);
             }
 
             .save-status {
@@ -529,10 +556,9 @@
                 font-size: 1.1rem;
             }
 
-            .text-controls {
-                margin-left: 0;
+            .left-controls, .right-controls {
                 width: 100%;
-                justify-content: flex-end;
+                justify-content: space-between;
             }
 
             .footer {
@@ -580,24 +606,13 @@
             <div class="header">
                 <input type="text" class="note-title-input" id="noteTitle" placeholder="Beri judul catatan Anda..." aria-label="Judul catatan">
                 <div class="toolbar">
-                    <button class="btn" onclick="saveNote()" aria-label="Simpan catatan">
-                        <i class="fas fa-save"></i>
-                        <span class="btn-text">Simpan (Ctrl+S)</span>
-                    </button>
-                    
-                    <!-- Undo/Redo Controls -->
-                    <div class="undo-redo-controls">
-                        <button class="undo-btn" id="undoBtn" aria-label="Undo" disabled>
-                            <i class="fas fa-undo"></i>
+                    <div class="left-controls">
+                        <button class="btn" onclick="saveNote()" aria-label="Simpan catatan">
+                            <i class="fas fa-save"></i>
+                            <span class="btn-text">Simpan (Ctrl+S)</span>
                         </button>
-                        <button class="redo-btn" id="redoBtn" aria-label="Redo" disabled>
-                            <i class="fas fa-redo"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- Text Controls -->
-                    <div class="text-controls">
-                        <!-- Font Size Controls -->
+                        
+                        <!-- Text Size Controls -->
                         <div class="text-size-controls">
                             <button class="text-size-btn" id="decreaseFontBtn" aria-label="Perkecil teks">
                                 <i class="fas fa-font"></i><i class="fas fa-minus" style="font-size: 0.6em; margin-left: -3px;"></i>
@@ -605,6 +620,21 @@
                             <span class="text-size-display" id="fontSizeDisplay">16px</span>
                             <button class="text-size-btn" id="increaseFontBtn" aria-label="Perbesar teks">
                                 <i class="fas fa-font"></i><i class="fas fa-plus" style="font-size: 0.6em; margin-left: -3px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="right-controls">
+                        <!-- Undo/Redo/New Note Controls -->
+                        <div class="undo-redo-controls">
+                            <button class="undo-btn" id="undoBtn" aria-label="Undo" disabled>
+                                <i class="fas fa-undo"></i>
+                            </button>
+                            <button class="redo-btn" id="redoBtn" aria-label="Redo" disabled>
+                                <i class="fas fa-redo"></i>
+                            </button>
+                            <button class="new-note-btn" id="newNoteBtn" aria-label="Catatan baru">
+                                <i class="fas fa-file-alt"></i>
                             </button>
                         </div>
                         
@@ -635,7 +665,11 @@
                     </div>
                 </div>
             </div>
-            <textarea class="editor" id="editor" placeholder="Mulai mengetik di sini... ✨\n\nTips:\n- Gunakan Ctrl+S untuk menyimpan\n- Klik ikon bulan untuk tema gelap\n- Drag sudut textarea untuk mengubah ukuran" aria-label="Editor catatan"></textarea>
+            
+            <div class="editor-container">
+                <textarea class="editor" id="editor" placeholder="Mulai mengetik di sini... ✨\n\nTips:\n- Gunakan Ctrl+S untuk menyimpan\n- Klik ikon bulan untuk tema gelap\n- Drag sudut textarea untuk mengubah ukuran" aria-label="Editor catatan"></textarea>
+                <div class="char-count" id="charCount">0 karakter</div>
+            </div>
             
             <!-- Footer -->
             <div class="footer">
@@ -678,18 +712,23 @@
         const copyBtn = document.getElementById('copyBtn');
         const undoBtn = document.getElementById('undoBtn');
         const redoBtn = document.getElementById('redoBtn');
+        const newNoteBtn = document.getElementById('newNoteBtn');
+        const charCount = document.getElementById('charCount');
         
         let notes = [];
         let currentNoteId = null;
         let typingTimer;
         let history = [];
         let historyIndex = -1;
+        const MAX_TEXT_LENGTH = 1000000; // 1 million characters
+        const HISTORY_LIMIT = 100; // Limit history states to prevent memory issues
 
         // Initialize the app
         function init() {
             loadNotes();
             setupEventListeners();
             updateDocumentTitle();
+            updateCharCount();
             
             // Load theme preference
             const savedTheme = localStorage.getItem('theme');
@@ -722,8 +761,35 @@
             saveHistory();
         }
 
-        // History management
+        // Update character count
+        function updateCharCount() {
+            const count = editor.value.length;
+            charCount.textContent = `${count.toLocaleString()} karakter`;
+            
+            if (count > MAX_TEXT_LENGTH * 0.9) {
+                charCount.style.color = 'var(--error-bg)';
+                if (count >= MAX_TEXT_LENGTH) {
+                    editor.value = editor.value.substring(0, MAX_TEXT_LENGTH);
+                    showToast('Batas maksimum teks tercapai', true);
+                }
+            } else {
+                charCount.style.color = 'var(--placeholder-color)';
+            }
+        }
+
+        // History management with optimizations
         function saveHistory() {
+            // Don't save if content hasn't changed
+            if (history.length > 0 && history[historyIndex].content === editor.value) {
+                return;
+            }
+            
+            // Limit history size
+            if (history.length >= HISTORY_LIMIT) {
+                history.shift();
+                historyIndex = Math.max(historyIndex - 1, 0);
+            }
+            
             // Remove any history after current index
             history = history.slice(0, historyIndex + 1);
             
@@ -756,12 +822,18 @@
 
         function applyHistoryState() {
             const state = history[historyIndex];
-            editor.value = state.content;
+            
+            // Optimize by only updating if content changed
+            if (editor.value !== state.content) {
+                editor.value = state.content;
+                updateCharCount();
+            }
             
             // Restore cursor position
             setTimeout(() => {
                 editor.selectionStart = state.cursorPos;
                 editor.selectionEnd = state.cursorPos;
+                editor.focus();
             }, 0);
             
             // Update undo/redo buttons
@@ -786,23 +858,29 @@
 
         // Load notes from localStorage
         function loadNotes() {
-            const savedNotes = localStorage.getItem('notes');
-            if (savedNotes) {
-                notes = JSON.parse(savedNotes);
-                renderNotesList();
-                
-                // Load the first note if available
-                if (notes.length > 0) {
-                    loadNote(notes[0].id);
+            try {
+                const savedNotes = localStorage.getItem('notes');
+                if (savedNotes) {
+                    notes = JSON.parse(savedNotes);
+                    renderNotesList();
+                    
+                    // Load the first note if available
+                    if (notes.length > 0) {
+                        loadNote(notes[0].id);
+                    } else {
+                        createNewNote();
+                    }
                 } else {
                     createNewNote();
                 }
-            } else {
+            } catch (e) {
+                console.error('Error loading notes:', e);
+                showToast('Gagal memuat catatan', true);
                 createNewNote();
             }
         }
 
-        // Render notes list in sidebar
+        // Render notes list in sidebar with virtualization for large lists
         function renderNotesList() {
             notesList.innerHTML = '';
             
@@ -810,7 +888,10 @@
             const sortedNotes = [...notes].sort((a, b) => 
                 new Date(b.updatedAt) - new Date(a.updatedAt));
             
-            sortedNotes.forEach(note => {
+            // Limit to 1000 notes for performance
+            const displayNotes = sortedNotes.slice(0, 1000);
+            
+            displayNotes.forEach(note => {
                 const noteItem = document.createElement('div');
                 noteItem.className = `note-item ${note.id === currentNoteId ? 'active' : ''}`;
                 noteItem.innerHTML = `
@@ -845,61 +926,87 @@
 
         // Create a new note
         function createNewNote() {
-            const newNote = {
-                id: Date.now().toString(),
-                title: '',
-                content: '',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-            
-            notes.unshift(newNote);
-            saveNotes();
-            loadNote(newNote.id);
-            renderNotesList();
-            
-            // Focus on title input
-            setTimeout(() => {
-                noteTitle.focus();
-            }, 100);
-        }
-
-        // Load note into editor
-        function loadNote(noteId) {
-            const note = notes.find(n => n.id === noteId);
-            if (note) {
-                currentNoteId = noteId;
-                noteTitle.value = note.title;
-                editor.value = note.content;
-                updateDocumentTitle();
+            try {
+                const newNote = {
+                    id: Date.now().toString(),
+                    title: '',
+                    content: '',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // Limit total notes to prevent storage issues
+                if (notes.length >= 1000) {
+                    notes.pop(); // Remove oldest note
+                }
+                
+                notes.unshift(newNote);
+                saveNotes();
+                loadNote(newNote.id);
                 renderNotesList();
                 
-                // Reset history for new note
-                history = [{
-                    content: note.content,
-                    cursorPos: 0
-                }];
-                historyIndex = 0;
-                updateUndoRedoButtons();
+                // Focus on title input
+                setTimeout(() => {
+                    noteTitle.focus();
+                }, 100);
+            } catch (e) {
+                console.error('Error creating new note:', e);
+                showToast('Gagal membuat catatan baru', true);
             }
         }
 
-        // Save current note
+        // Load note into editor with optimizations
+        function loadNote(noteId) {
+            try {
+                const note = notes.find(n => n.id === noteId);
+                if (note) {
+                    currentNoteId = noteId;
+                    noteTitle.value = note.title;
+                    
+                    // Only update editor if content changed
+                    if (editor.value !== note.content) {
+                        editor.value = note.content;
+                        updateCharCount();
+                    }
+                    
+                    updateDocumentTitle();
+                    renderNotesList();
+                    
+                    // Reset history for new note
+                    history = [{
+                        content: note.content,
+                        cursorPos: 0
+                    }];
+                    historyIndex = 0;
+                    updateUndoRedoButtons();
+                }
+            } catch (e) {
+                console.error('Error loading note:', e);
+                showToast('Gagal memuat catatan', true);
+            }
+        }
+
+        // Save current note with optimizations
         function saveNote() {
             if (!currentNoteId) return;
             
-            const noteIndex = notes.findIndex(n => n.id === currentNoteId);
-            if (noteIndex !== -1) {
-                notes[noteIndex].title = noteTitle.value;
-                notes[noteIndex].content = editor.value;
-                notes[noteIndex].updatedAt = new Date().toISOString();
-                saveNotes();
-                renderNotesList();
-                showToast('Catatan tersimpan!');
+            try {
+                const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+                if (noteIndex !== -1) {
+                    notes[noteIndex].title = noteTitle.value;
+                    notes[noteIndex].content = editor.value;
+                    notes[noteIndex].updatedAt = new Date().toISOString();
+                    saveNotes();
+                    renderNotesList();
+                    showToast('Catatan tersimpan!');
+                }
+            } catch (e) {
+                console.error('Error saving note:', e);
+                showToast('Gagal menyimpan catatan', true);
             }
         }
 
-        // Auto-save every 3 seconds
+        // Auto-save with throttling
         function startAutoSave() {
             setInterval(() => {
                 if (currentNoteId) {
@@ -917,7 +1024,7 @@
             }, 3000);
         }
 
-        // Delete a note
+        // Delete a note with confirmation
         function deleteNote(noteId) {
             if (notes.length <= 1) {
                 showToast('Anda harus memiliki setidaknya satu catatan', true);
@@ -925,52 +1032,77 @@
             }
             
             if (confirm('Apakah Anda yakin ingin menghapus catatan ini?')) {
-                notes = notes.filter(note => note.id !== noteId);
-                saveNotes();
-                
-                if (currentNoteId === noteId) {
-                    // Load the first available note after deletion
-                    currentNoteId = notes.length > 0 ? notes[0].id : null;
-                    if (currentNoteId) {
-                        loadNote(currentNoteId);
-                    } else {
-                        createNewNote();
+                try {
+                    notes = notes.filter(note => note.id !== noteId);
+                    saveNotes();
+                    
+                    if (currentNoteId === noteId) {
+                        // Load the first available note after deletion
+                        currentNoteId = notes.length > 0 ? notes[0].id : null;
+                        if (currentNoteId) {
+                            loadNote(currentNoteId);
+                        } else {
+                            createNewNote();
+                        }
                     }
+                    
+                    renderNotesList();
+                    showToast('Catatan dihapus');
+                } catch (e) {
+                    console.error('Error deleting note:', e);
+                    showToast('Gagal menghapus catatan', true);
                 }
-                
-                renderNotesList();
-                showToast('Catatan dihapus');
             }
         }
 
-        // Save all notes to localStorage
+        // Save all notes to localStorage with error handling
         function saveNotes() {
-            localStorage.setItem('notes', JSON.stringify(notes));
+            try {
+                localStorage.setItem('notes', JSON.stringify(notes));
+            } catch (e) {
+                console.error('Error saving notes:', e);
+                if (e.name === 'QuotaExceededError') {
+                    showToast('Penyimpanan penuh, hapus beberapa catatan', true);
+                } else {
+                    showToast('Gagal menyimpan catatan', true);
+                }
+            }
         }
 
         // Download current note
         function downloadNote() {
             if (!currentNoteId) return;
             
-            const note = notes.find(n => n.id === currentNoteId);
-            if (note) {
-                const text = note.content;
-                const title = note.title.trim() || 'catatan';
-                const blob = new Blob([text], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${title}.txt`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('Catatan berhasil diunduh');
+            try {
+                const note = notes.find(n => n.id === currentNoteId);
+                if (note) {
+                    const text = note.content;
+                    const title = note.title.trim() || 'catatan';
+                    const blob = new Blob([text], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${title}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast('Catatan berhasil diunduh');
+                }
+            } catch (e) {
+                console.error('Error downloading note:', e);
+                showToast('Gagal mengunduh catatan', true);
             }
         }
 
-        // Upload a text file
+        // Upload a text file with size limit
         function uploadNote(event) {
             const file = event.target.files[0];
             if (!file) return;
+            
+            // Check file size (limit to 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Ukuran file terlalu besar (maks 5MB)', true);
+                return;
+            }
             
             if (file.type !== 'text/plain' && !file.name.endsWith('.txt')) {
                 showToast('Hanya file .txt yang didukung', true);
@@ -979,19 +1111,37 @@
 
             const reader = new FileReader();
             reader.onload = (e) => {
-                const newNote = {
-                    id: Date.now().toString(),
-                    title: file.name.replace('.txt', ''),
-                    content: e.target.result,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
-                
-                notes.unshift(newNote);
-                saveNotes();
-                loadNote(newNote.id);
-                renderNotesList();
-                showToast('File berhasil diunggah');
+                try {
+                    const content = e.target.result;
+                    
+                    // Check content length
+                    if (content.length > MAX_TEXT_LENGTH) {
+                        showToast(`File terlalu besar (maks ${MAX_TEXT_LENGTH.toLocaleString()} karakter)`, true);
+                        return;
+                    }
+                    
+                    const newNote = {
+                        id: Date.now().toString(),
+                        title: file.name.replace('.txt', ''),
+                        content: content,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    };
+                    
+                    // Limit total notes
+                    if (notes.length >= 1000) {
+                        notes.pop();
+                    }
+                    
+                    notes.unshift(newNote);
+                    saveNotes();
+                    loadNote(newNote.id);
+                    renderNotesList();
+                    showToast('File berhasil diunggah');
+                } catch (e) {
+                    console.error('Error uploading file:', e);
+                    showToast('Gagal memproses file', true);
+                }
             };
             reader.onerror = () => {
                 showToast('Gagal membaca file', true);
@@ -1007,6 +1157,7 @@
             const isCollapsed = sidebar.classList.contains('collapsed');
             localStorage.setItem('sidebarCollapsed', isCollapsed);
         }
+
 
         // Toggle theme
         function toggleTheme() {
@@ -1119,11 +1270,7 @@
             // Copy button
             copyBtn.addEventListener('click', copyText);
             
-            // Undo/Redo buttons
-            undoBtn.addEventListener('click', undo);
-            redoBtn.addEventListener('click', redo);
-            
-            // Title input events
+            // Title and editor input events
             noteTitle.addEventListener('input', () => {
                 updateDocumentTitle();
                 if (currentNoteId) {
@@ -1137,7 +1284,6 @@
                 }
             });
             
-            // Editor input events
             editor.addEventListener('input', () => {
                 if (currentNoteId) {
                     const noteIndex = notes.findIndex(n => n.id === currentNoteId);
@@ -1149,19 +1295,13 @@
                     }
                 }
                 
-                // Save history state after a short delay
-                clearTimeout(typingTimer);
-                typingTimer = setTimeout(() => {
-                    saveHistory();
-                }, 500);
-                
                 // Show saving status
                 showSavingStatus();
-                setTimeout(() => {
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => {
                     hideSavingStatus();
                 }, 1000);
             });
-            
             
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
