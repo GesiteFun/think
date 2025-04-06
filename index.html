@@ -4,37 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern Notepad Pro</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #ffffff;
+            --bg-color: #f9f9f9;
             --text-color: #333333;
-            --primary-color: #2196f3;
-            --secondary-color: #f5f5f5;
-            --gradient-start: #2196f3;
-            --gradient-end: #e91e63;
+            --primary-color: #4a90e2;
+            --secondary-color: #ffffff;
+            --gradient-start: #6c63ff;
+            --gradient-end: #4a90e2;
             --toast-bg: #4caf50;
             --error-bg: #f44336;
+            --border-color: #e0e0e0;
         }
 
         .dark-mode {
             --bg-color: #1a1a1a;
-            --text-color: #ffffff;
+            --text-color: #f0f0f0;
             --secondary-color: #2d2d2d;
-            --gradient-start: #673ab7;
-            --gradient-end: #2196f3;
+            --gradient-start: #6c63ff;
+            --gradient-end: #4a90e2;
             --toast-bg: #2e7d32;
             --error-bg: #c62828;
+            --border-color: #444444;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             line-height: 1.6;
@@ -49,21 +55,22 @@
 
         .header {
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            padding: 1rem;
-            border-radius: 10px;
+            padding: 1.2rem;
+            border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
         }
 
         .note-title {
             width: 100%;
-            padding: 12px;
-            font-size: 1.5rem;
+            padding: 14px;
+            font-size: 1.4rem;
+            font-weight: 500;
             border: none;
-            border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.15);
             color: white;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .note-title::placeholder {
@@ -77,64 +84,82 @@
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 10px 18px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.15);
             color: white;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn i {
+            margin-right: 6px;
+            font-size: 0.9em;
         }
 
         .editor {
             width: 100%;
             min-height: 70vh;
-            padding: 20px;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 10px;
+            padding: 22px;
+            font-size: 1.05rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             background-color: var(--secondary-color);
             color: var(--text-color);
             resize: vertical;
+            line-height: 1.7;
         }
 
         .editor:focus {
             outline: 2px solid var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
         }
 
         #theme-toggle {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 24px;
+            right: 24px;
             width: 50px;
             height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #theme-toggle:hover {
+            transform: scale(1.05);
         }
 
         .toast {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            padding: 15px 25px;
+            padding: 14px 24px;
             background-color: var(--toast-bg);
             color: white;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             transform: translateY(100px);
             opacity: 0;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             z-index: 1000;
+            font-weight: 500;
         }
 
         .toast.show {
@@ -148,30 +173,42 @@
 
         @media (max-width: 768px) {
             .container {
-                padding: 10px;
+                padding: 15px;
             }
             
             .note-title {
                 font-size: 1.2rem;
+                padding: 12px;
             }
             
             .btn {
                 flex-grow: 1;
                 justify-content: center;
-                padding: 8px 12px;
+                padding: 10px 12px;
                 font-size: 0.9rem;
             }
             
             .editor {
-                min-height: 50vh;
+                min-height: 60vh;
                 font-size: 1rem;
-                padding: 15px;
+                padding: 18px;
             }
         }
 
         @media (max-width: 480px) {
-            .btn span {
+            .btn-text {
                 display: none;
+            }
+            
+            .btn i {
+                margin-right: 0;
+                font-size: 1em;
+            }
+            
+            #theme-toggle {
+                width: 44px;
+                height: 44px;
+                font-size: 1rem;
             }
         }
     </style>
@@ -182,22 +219,28 @@
             <input type="text" class="note-title" id="noteTitle" placeholder="Judul Catatan" aria-label="Judul catatan">
             <div class="toolbar">
                 <button class="btn" onclick="saveNote()" aria-label="Simpan catatan">
-                    <span>💾</span> Simpan (Ctrl+S)
+                    <i class="fas fa-save"></i>
+                    <span class="btn-text">Simpan (Ctrl+S)</span>
                 </button>
                 <button class="btn" onclick="newNote()" aria-label="Catatan baru">
-                    <span>📄</span> Baru (Ctrl+N)
+                    <i class="fas fa-file-alt"></i>
+                    <span class="btn-text">Baru (Ctrl+N)</span>
                 </button>
                 <button class="btn" onclick="downloadNote()" aria-label="Download catatan">
-                    <span>📥</span> Download
+                    <i class="fas fa-download"></i>
+                    <span class="btn-text">Download</span>
                 </button>
                 <label class="btn" aria-label="Upload file teks">
-                    <span>📤</span> Upload
+                    <i class="fas fa-upload"></i>
+                    <span class="btn-text">Upload</span>
                     <input type="file" hidden accept=".txt" onchange="uploadNote(event)">
                 </label>
             </div>
         </div>
         <textarea class="editor" id="editor" placeholder="Ketik catatan Anda di sini... Tekan Ctrl+S untuk menyimpan" aria-label="Editor catatan"></textarea>
-        <button class="btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle tema gelap/terang">🌙</button>
+        <button class="btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle tema gelap/terang">
+            <i class="fas fa-moon"></i>
+        </button>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -226,9 +269,9 @@
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark-mode') {
                 document.body.classList.add('dark-mode');
-                themeToggle.textContent = '☀️';
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
             } else {
-                themeToggle.textContent = '🌙';
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
             }
         });
 
@@ -318,7 +361,7 @@
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             const isDarkMode = document.body.classList.contains('dark-mode');
-            themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
             localStorage.setItem('theme', isDarkMode ? 'dark-mode' : 'light-mode');
         }
 
