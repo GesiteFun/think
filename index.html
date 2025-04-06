@@ -227,7 +227,6 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-left: auto;
         }
 
         /* Text Size Controls */
@@ -630,44 +629,44 @@
                         </button>
                     </div>
                     
-                    <!-- Text Controls -->
-                    <div class="text-controls">
-                        <!-- Font Size Controls -->
-                        <div class="text-size-controls">
-                            <button class="text-size-btn" id="decreaseFontBtn" aria-label="Perkecil teks">
-                                <i class="fas fa-font"></i><i class="fas fa-minus" style="font-size: 0.6em; margin-left: -3px;"></i>
-                            </button>
-                            <span class="text-size-display" id="fontSizeDisplay">16px</span>
-                            <button class="text-size-btn" id="increaseFontBtn" aria-label="Perbesar teks">
-                                <i class="fas fa-font"></i><i class="fas fa-plus" style="font-size: 0.6em; margin-left: -3px;"></i>
-                            </button>
-                        </div>
-                        
-                        <!-- Font Weight Toggle -->
-                        <button class="font-weight-btn" id="fontWeightBtn" aria-label="Toggle font weight">
-                            <i class="fas fa-bold"></i>
-                            <span class="btn-text">Bold</span>
-                        </button>
-                        
-                        <!-- Copy Button -->
-                        <button class="copy-btn" id="copyBtn" aria-label="Salin teks">
-                            <i class="far fa-copy"></i>
-                            <span class="btn-text">Salin</span>
-                        </button>
-                        
-                        <!-- Download Button -->
-                        <button class="btn" onclick="downloadNote()" aria-label="Download catatan">
-                            <i class="fas fa-download"></i>
-                            <span class="btn-text">Download</span>
-                        </button>
-                        
-                        <!-- Upload Button -->
-                        <label class="btn" aria-label="Upload file teks">
-                            <i class="fas fa-upload"></i>
-                            <span class="btn-text">Unggah</span>
-                            <input type="file" hidden accept=".txt" onchange="uploadNote(event)">
-                        </label>
-                    </div>
+<!-- Text Controls -->
+<div class="text-controls">
+    <!-- Font Weight Toggle -->
+    <button class="font-weight-btn" id="fontWeightBtn" aria-label="Toggle font weight">
+        <i class="fas fa-bold"></i>
+        <span class="btn-text">Bold</span>
+    </button>
+    
+    <!-- Copy Button -->
+    <button class="copy-btn" id="copyBtn" aria-label="Salin teks">
+        <i class="far fa-copy"></i>
+        <span class="btn-text">Salin</span>
+    </button>
+    
+    <!-- Font Size Controls --> <!-- DIPINDAH KE SINI -->
+    <div class="text-size-controls">
+        <button class="text-size-btn" id="decreaseFontBtn" aria-label="Perkecil teks">
+            <i class="fas fa-font"></i><i class="fas fa-minus" style="font-size: 0.6em; margin-left: -3px;"></i>
+        </button>
+        <span class="text-size-display" id="fontSizeDisplay">16px</span>
+        <button class="text-size-btn" id="increaseFontBtn" aria-label="Perbesar teks">
+            <i class="fas fa-font"></i><i class="fas fa-plus" style="font-size: 0.6em; margin-left: -3px;"></i>
+        </button>
+    </div>
+    
+    <!-- Download Button -->
+    <button class="btn" onclick="downloadNote()" aria-label="Download catatan">
+        <i class="fas fa-download"></i>
+        <span class="btn-text">Download</span>
+    </button>
+    
+    <!-- Upload Button -->
+    <label class="btn" aria-label="Upload file teks">
+        <i class="fas fa-upload"></i>
+        <span class="btn-text">Unggah</span>
+        <input type="file" hidden accept=".txt" onchange="uploadNote(event)">
+    </label>
+</div>
                 </div>
             </div>
             <textarea class="editor" id="editor" placeholder="Mulai mengetik di sini... ✨\n\nTips:\n- Gunakan Ctrl+S untuk menyimpan\n- Klik ikon bulan untuk tema gelap\n- Drag sudut textarea untuk mengubah ukuran" aria-label="Editor catatan"></textarea>
