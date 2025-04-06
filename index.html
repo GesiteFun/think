@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✍️ Notepad Pro with Sidebar</title>
+    <title>Notepad Pro</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Google Fonts - Inter -->
@@ -24,7 +24,7 @@
             --sidebar-bg: #ffffff;
             --sidebar-text: #333333;
         }
-        
+
         .dark-mode {
             --bg-color: #1a1a1a;
             --text-color: #f0f0f0;
@@ -62,20 +62,19 @@
             background-color: var(--sidebar-bg);
             color: var(--sidebar-text);
             height: 100vh;
-            position: fixed;
+            position: sticky;
             top: 0;
             left: 0;
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
             overflow: hidden;
-            z-index: 100;
+            z-index: 10;
         }
 
         .sidebar.collapsed {
-            transform: translateX(-250px);
-            width: 0;
+            width: 60px;
         }
 
         .sidebar-header {
@@ -211,16 +210,14 @@
 
         /* Main Content */
         .main-content {
-            margin-left: 250px;
-            transition: margin-left 0.3s ease;
-            width: calc(100% - 250px);
+            flex: 1;
             display: flex;
             flex-direction: column;
+            transition: margin-left 0.3s ease;
         }
 
         .sidebar.collapsed + .main-content {
-            margin-left: 0;
-            width: 100%;
+            margin-left: -190px;
         }
 
         .container {
@@ -375,51 +372,26 @@
             transform: translateY(0);
         }
 
-        /* Mobile Menu Button */
-        .mobile-menu-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 110;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: left 0.3s ease;
-        }
-
-        .sidebar.collapsed + .main-content .mobile-menu-btn {
-            left: 15px;
-        }
-
-        .sidebar:not(.collapsed) + .main-content .mobile-menu-btn {
-            left: 270px;
-        }
-
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .sidebar {
-                transform: translateX(-250px);
+                position: fixed;
+                left: -100%;
+                z-index: 1000;
+                height: 100vh;
+                transition: left 0.3s ease;
             }
-            
+
             .sidebar.show-mobile {
-                transform: translateX(0);
-                width: 250px;
+                left: 0;
             }
-            
+
             .main-content {
                 margin-left: 0 !important;
-                width: 100% !important;
             }
 
             .mobile-menu-btn {
-                display: flex !important;
+                display: block !important;
             }
 
             .container {
@@ -465,6 +437,24 @@
                 height: 44px;
                 font-size: 1rem;
             }
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -555,12 +545,6 @@
             if (savedTheme === 'dark-mode') {
                 document.body.classList.add('dark-mode');
                 themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            }
-            
-            // Load sidebar state
-            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            if (isCollapsed) {
-                sidebar.classList.add('collapsed');
             }
             
             // Check mobile view
@@ -773,10 +757,6 @@
         // Toggle sidebar collapse
         function toggleSidebar() {
             sidebar.classList.toggle('collapsed');
-            
-            // Save sidebar state to localStorage
-            const isCollapsed = sidebar.classList.contains('collapsed');
-            localStorage.setItem('sidebarCollapsed', isCollapsed);
         }
 
         // Toggle theme
@@ -830,9 +810,11 @@
         // Check if mobile view
         function checkMobileView() {
             if (window.innerWidth <= 768) {
-                sidebar.classList.add('collapsed');
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.add('show-mobile');
                 mobileMenuBtn.style.display = 'flex';
             } else {
+                sidebar.classList.remove('show-mobile');
                 mobileMenuBtn.style.display = 'none';
             }
         }
@@ -843,7 +825,9 @@
             toggleBtn.addEventListener('click', toggleSidebar);
             
             // Mobile menu button
-            mobileMenuBtn.addEventListener('click', toggleSidebar);
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('show-mobile');
+            });
             
             // Add new note button
             addNoteBtn.addEventListener('click', createNewNote);
