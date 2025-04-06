@@ -1,841 +1,260 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tebak Kata - Mini Game</title>
+    <title>Modern Notepad</title>
     <style>
         :root {
-            --primary: #6e45e2;
-            --secondary: #88d3ce;
-            --accent: #ff7e5f;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --primary-color: #2196f3;
+            --secondary-color: #f5f5f5;
+            --gradient-start: #2196f3;
+            --gradient-end: #e91e63;
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --secondary-color: #2d2d2d;
+            --gradient-start: #673ab7;
+            --gradient-end: #2196f3;
         }
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
         }
 
         body {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            color: var(--light);
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            width: 100%;
-            max-width: 800px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 0.5s ease-out;
-            transition: all 0.3s ease;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-weight: 700;
-            color: white;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
+        .header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 1rem;
             border-radius: 10px;
-            animation: slideIn 0.5s ease-out;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .level-display {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .score-display {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .question-container {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            text-align: center;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.7s ease-out;
-        }
-
-        .question {
+        .note-title {
+            width: 100%;
+            padding: 12px;
             font-size: 1.5rem;
-            font-weight: 600;
-            word-wrap: break-word;
-        }
-
-        .answer-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .answer-input {
-            padding: 15px;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            background: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-            width: 100%;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-bottom: 10px;
         }
 
-        .answer-input:focus {
-            outline: none;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(110, 69, 226, 0.3);
-            transform: translateY(-2px);
+        .note-title::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn {
-            padding: 12px 25px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-primary {
-            background: var(--accent);
+            background-color: rgba(255, 255, 255, 0.1);
             color: white;
-        }
-
-        .btn-primary:hover {
-            background: #ff6a45;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255, 126, 95, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .action-buttons {
             display: flex;
-            gap: 15px;
-            justify-content: center;
+            align-items: center;
+            gap: 5px;
         }
 
-        .hint-container {
-            margin-top: 20px;
-            background: rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            display: none;
-            animation: fadeIn 0.5s ease-out;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .hint-text {
-            font-style: italic;
-        }
-
-        .level-complete {
-            display: none;
-            text-align: center;
-            animation: zoomIn 0.5s ease-out;
-        }
-
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .level-complete h2 {
-            color: var(--success);
-            margin-bottom: 15px;
-        }
-
-        .game-complete {
-            display: none;
-            text-align: center;
-            animation: zoomIn 0.5s ease-out;
-        }
-
-        .game-complete h2 {
-            color: var(--accent);
-            margin-bottom: 15px;
-        }
-
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: var(--accent);
-            opacity: 0;
-            animation: confetti 3s ease-in-out infinite;
-        }
-
-        @keyframes confetti {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
-
-        .admin-panel {
-            margin-top: 30px;
+        .editor {
+            width: 100%;
+            min-height: 70vh;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.1);
+            font-size: 1.1rem;
+            border: none;
             border-radius: 10px;
-            display: none;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            resize: vertical;
         }
 
-        .admin-panel h3 {
-            margin-bottom: 15px;
-            text-align: center;
+        .editor:focus {
+            outline: 2px solid var(--primary-color);
         }
 
-        .admin-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .admin-input {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .admin-btn {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background: var(--primary);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .admin-btn:hover {
-            background: #5d38c7;
-        }
-
-        .toggle-admin {
+        #theme-toggle {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-admin:hover {
-            background: rgba(0, 0, 0, 0.7);
-            transform: scale(1.1);
         }
 
         @media (max-width: 768px) {
             .container {
-                padding: 20px;
+                padding: 10px;
             }
             
-            .action-buttons {
-                flex-direction: column;
+            .note-title {
+                font-size: 1.2rem;
             }
             
             .btn {
-                width: 100%;
+                flex-grow: 1;
+                justify-content: center;
             }
-            
-            .game-info {
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
-            }
-        }
-
-        /* Animasi tambahan */
-        .bounce {
-            animation: bounce 0.5s;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .shake {
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Tebak Kata</h1>
-        
-        <div class="game-info">
-            <div class="level-display">Level: <span id="current-level">1</span>/<span id="total-levels">30</span></div>
-            <div class="score-display">Skor: <span id="score">0</span></div>
-        </div>
-        
-        <div class="question-container">
-            <div class="question" id="question">Memuat pertanyaan...</div>
-        </div>
-        
-        <div class="answer-container">
-            <input type="text" class="answer-input" id="answer-input" placeholder="Masukkan jawaban Anda...">
-            <div class="action-buttons">
-                <button class="btn btn-primary" id="submit-btn">Submit</button>
-                <button class="btn btn-secondary" id="hint-btn">Hint</button>
+        <div class="header">
+            <input type="text" class="note-title" id="noteTitle" placeholder="Judul Catatan">
+            <div class="toolbar">
+                <button class="btn" onclick="saveNote()">
+                    <span>💾</span> Simpan (Ctrl+S)
+                </button>
+                <button class="btn" onclick="newNote()">
+                    <span>📄</span> Baru (Ctrl+N)
+                </button>
+                <button class="btn" onclick="downloadNote()">
+                    <span>📥</span> Download
+                </button>
+                <label class="btn">
+                    <span>📤</span> Upload
+                    <input type="file" hidden accept=".txt" onchange="uploadNote(event)">
+                </label>
             </div>
         </div>
-        
-        <div class="hint-container" id="hint-container">
-            <p class="hint-text" id="hint-text">Hint akan muncul di sini</p>
-        </div>
-        
-        <div class="level-complete" id="level-complete">
-            <h2>Level Selesai!</h2>
-            <p>Jawaban yang benar: <span id="correct-answer"></span></p>
-            <button class="btn btn-primary" id="next-level-btn">Level Berikutnya</button>
-        </div>
-        
-        <div class="game-complete" id="game-complete">
-            <h2>Selamat! Anda Menyelesaikan Semua Level!</h2>
-            <p>Skor akhir Anda: <span id="final-score">0</span></p>
-            <button class="btn btn-primary" id="restart-game-btn">Main Lagi</button>
-        </div>
-        
-        <div class="admin-panel" id="admin-panel">
-            <h3>Admin Panel</h3>
-            <div class="admin-form">
-                <input type="number" class="admin-input" id="admin-level" placeholder="Level">
-                <input type="text" class="admin-input" id="admin-question" placeholder="Pertanyaan">
-                <input type="text" class="admin-input" id="admin-answer" placeholder="Jawaban">
-                <input type="text" class="admin-input" id="admin-hint" placeholder="Hint">
-                <button class="admin-btn" id="add-level-btn">Tambah Level</button>
-                <button class="admin-btn" id="update-level-btn">Update Level</button>
-                <button class="admin-btn" id="reset-game-btn">Reset Game</button>
-            </div>
-        </div>
+        <textarea class="editor" id="editor" placeholder="Ketik catatan Anda di sini..."></textarea>
+        <button class="btn" id="theme-toggle" onclick="toggleTheme()">🌓</button>
     </div>
-    
-    <button class="toggle-admin" id="toggle-admin">A</button>
-    
+
     <script>
-        // Data level game
-        let gameData = {
-            currentLevel: 1,
-            score: 0,
-            levels: [
-                // Level 1-30 akan diisi atau diambil dari localStorage
-            ],
-            defaultLevels: [
-                {
-                    question: "Binatang yang dikenal sebagai raja hutan?",
-                    answer: "singa",
-                    hint: "Berkelompok disebut 'pride'"
-                },
-                {
-                    question: "Ibu kota Indonesia?",
-                    answer: "jakarta",
-                    hint: "Terletak di pulau Jawa"
-                },
-                {
-                    question: "Warna yang dihasilkan dari campuran merah dan biru?",
-                    answer: "ungu",
-                    hint: "Warna kerajaan"
-                },
-                {
-                    question: "Planet terdekat dari matahari?",
-                    answer: "merkurius",
-                    hint: "Nama dewa Romawi"
-                },
-                {
-                    question: "Alat untuk melihat bintang dan planet?",
-                    answer: "teleskop",
-                    hint: "Ditemukan oleh Galileo"
-                },
-                {
-                    question: "Buah yang memiliki kulit berduri?",
-                    answer: "durian",
-                    hint: "Raja buah"
-                },
-                {
-                    question: "Negara terbesar di dunia?",
-                    answer: "rusia",
-                    hint: "Terletak di dua benua"
-                },
-                {
-                    question: "Lambang kimia untuk emas?",
-                    answer: "au",
-                    hint: "Dari bahasa Latin 'aurum'"
-                },
-                {
-                    question: "Satelit alami bumi?",
-                    answer: "bulan",
-                    hint: "Mempengaruhi pasang surut"
-                },
-                {
-                    question: "Penemu lampu pijar?",
-                    answer: "thomas edison",
-                    hint: "Juga menemukan fonograf"
-                },
-                {
-                    question: "Hewan terbesar di dunia?",
-                    answer: "paus biru",
-                    hint: "Hidup di laut"
-                },
-                {
-                    question: "Zat yang membuat daun hijau?",
-                    answer: "klorofil",
-                    hint: "Untuk fotosintesis"
-                },
-                {
-                    question: "Benua terkecil di dunia?",
-                    answer: "australia",
-                    hint: "Juga nama negara"
-                },
-                {
-                    question: "Ibukota Prancis?",
-                    answer: "paris",
-                    hint: "Menara Eiffel"
-                },
-                {
-                    question: "Penulis novel Harry Potter?",
-                    answer: "jk rowling",
-                    hint: "Penulis wanita Inggris"
-                },
-                {
-                    question: "Lawan kata dari siang?",
-                    answer: "malam",
-                    hint: "Waktu untuk tidur"
-                },
-                {
-                    question: "Pegunungan tertinggi di dunia?",
-                    answer: "himalaya",
-                    hint: "Ada Gunung Everest"
-                },
-                {
-                    question: "Benda untuk memotong kertas?",
-                    answer: "gunting",
-                    hint: "Dua bilah logam"
-                },
-                {
-                    question: "Warna pelangi yang pertama?",
-                    answer: "merah",
-                    hint: "Panjang gelombang terpanjang"
-                },
-                {
-                    question: "Alat untuk mengukur suhu?",
-                    answer: "termometer",
-                    hint: "Bisa berisi air raksa"
-                },
-                {
-                    question: "Planet terbesar di tata surya?",
-                    answer: "jupiter",
-                    hint: "Memiliki bintik merah besar"
-                },
-                {
-                    question: "Ikan yang bisa berjalan di darat?",
-                    answer: "ikan lele",
-                    hint: "Memiliki kumis"
-                },
-                {
-                    question: "Bahan utama pembuatan kaca?",
-                    answer: "pasir",
-                    hint: "Ditemukan di pantai"
-                },
-                {
-                    question: "Hewan yang bisa mengubah warna kulit?",
-                    answer: "bunglon",
-                    hint: "Reptil kecil"
-                },
-                {
-                    question: "Negara dengan populasi terbanyak?",
-                    answer: "china",
-                    hint: "Tembok besar"
-                },
-                {
-                    question: "Buah dengan biji di luar?",
-                    answer: "strawberry",
-                    hint: "Warna merah"
-                },
-                {
-                    question: "Alat musik petik dari Hawaii?",
-                    answer: "ukulele",
-                    hint: "Seperti gitar kecil"
-                },
-                {
-                    question: "Pencipta teori relativitas?",
-                    answer: "albert einstein",
-                    hint: "Rumus E=mc²"
-                },
-                {
-                    question: "Sungai terpanjang di dunia?",
-                    answer: "sungai nil",
-                    hint: "Di Mesir"
-                },
-                {
-                    question: "Satuan ukuran untuk daya komputer?",
-                    answer: "bit",
-                    hint: "Binary digit"
-                }
-            ]
-        };
-
-        // DOM Elements
-        const currentLevelEl = document.getElementById('current-level');
-        const totalLevelsEl = document.getElementById('total-levels');
-        const scoreEl = document.getElementById('score');
-        const questionEl = document.getElementById('question');
-        const answerInputEl = document.getElementById('answer-input');
-        const submitBtn = document.getElementById('submit-btn');
-        const hintBtn = document.getElementById('hint-btn');
-        const hintContainerEl = document.getElementById('hint-container');
-        const hintTextEl = document.getElementById('hint-text');
-        const levelCompleteEl = document.getElementById('level-complete');
-        const correctAnswerEl = document.getElementById('correct-answer');
-        const nextLevelBtn = document.getElementById('next-level-btn');
-        const gameCompleteEl = document.getElementById('game-complete');
-        const finalScoreEl = document.getElementById('final-score');
-        const restartGameBtn = document.getElementById('restart-game-btn');
-        const adminPanelEl = document.getElementById('admin-panel');
-        const toggleAdminBtn = document.getElementById('toggle-admin');
-        const adminLevelEl = document.getElementById('admin-level');
-        const adminQuestionEl = document.getElementById('admin-question');
-        const adminAnswerEl = document.getElementById('admin-answer');
-        const adminHintEl = document.getElementById('admin-hint');
-        const addLevelBtn = document.getElementById('add-level-btn');
-        const updateLevelBtn = document.getElementById('update-level-btn');
-        const resetGameBtn = document.getElementById('reset-game-btn');
-
-        // Initialize game
-        function initGame() {
-            // Load game data from localStorage or use default
-            const savedData = localStorage.getItem('tebakKataGame');
-            if (savedData) {
-                gameData = JSON.parse(savedData);
-                
-                // Jika levels kosong, gunakan default
-                if (gameData.levels.length === 0) {
-                    gameData.levels = [...gameData.defaultLevels];
-                }
-            } else {
-                gameData.levels = [...gameData.defaultLevels];
-                saveGameData();
+        // Load saved note
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedNote = localStorage.getItem('note');
+            if (savedNote) {
+                const { title, content } = JSON.parse(savedNote);
+                document.getElementById('noteTitle').value = title;
+                document.getElementById('editor').value = content;
             }
             
-            // Set current level and score
-            gameData.currentLevel = parseInt(localStorage.getItem('tebakKataCurrentLevel')) || 1;
-            gameData.score = parseInt(localStorage.getItem('tebakKataScore')) || 0;
-            
-            // Update UI
-            updateUI();
-            loadLevel(gameData.currentLevel);
-        }
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark-mode') document.body.classList.add('dark-mode');
+        });
 
-        // Save game data to localStorage
-        function saveGameData() {
-            localStorage.setItem('tebakKataGame', JSON.stringify(gameData));
-            localStorage.setItem('tebakKataCurrentLevel', gameData.currentLevel);
-            localStorage.setItem('tebakKataScore', gameData.score);
-        }
+        // Auto-save every 3 seconds
+        setInterval(() => {
+            if (validateTitle()) saveToStorage();
+        }, 3000);
 
-        // Update UI elements
-        function updateUI() {
-            currentLevelEl.textContent = gameData.currentLevel;
-            totalLevelsEl.textContent = gameData.levels.length;
-            scoreEl.textContent = gameData.score;
-        }
-
-        // Load level
-        function loadLevel(level) {
-            if (level > gameData.levels.length) {
-                showGameComplete();
-                return;
+        function validateTitle() {
+            const title = document.getElementById('noteTitle').value.trim();
+            if (!title) {
+                alert('Judul catatan tidak boleh kosong!');
+                return false;
             }
-            
-            const levelData = gameData.levels[level - 1];
-            questionEl.textContent = levelData.question;
-            answerInputEl.value = '';
-            hintContainerEl.style.display = 'none';
-            levelCompleteEl.style.display = 'none';
-            gameCompleteEl.style.display = 'none';
-            
-            // Focus on input
-            answerInputEl.focus();
+            return true;
         }
 
-        // Check answer
-        function checkAnswer() {
-            const userAnswer = answerInputEl.value.trim().toLowerCase();
-            const correctAnswer = gameData.levels[gameData.currentLevel - 1].answer.toLowerCase();
-            
-            if (userAnswer === correctAnswer) {
-                // Correct answer
-                gameData.score += 10;
-                saveGameData();
-                updateUI();
-                showLevelComplete(correctAnswer);
-                
-                // Add confetti effect
-                createConfetti();
-            } else {
-                // Wrong answer
-                answerInputEl.classList.add('shake');
-                setTimeout(() => {
-                    answerInputEl.classList.remove('shake');
-                }, 500);
-                
-                // Deduct points only if score is more than 0
-                if (gameData.score > 0) {
-                    gameData.score -= 2;
-                    saveGameData();
-                    updateUI();
-                }
-            }
+        function saveNote() {
+            if (!validateTitle()) return;
+            saveToStorage();
+            alert('Catatan tersimpan!');
         }
 
-        // Show level complete
-        function showLevelComplete(correctAnswer) {
-            correctAnswerEl.textContent = correctAnswer;
-            levelCompleteEl.style.display = 'block';
-            questionEl.classList.add('bounce');
-        }
-
-        // Show game complete
-        function showGameComplete() {
-            finalScoreEl.textContent = gameData.score;
-            gameCompleteEl.style.display = 'block';
-            questionEl.classList.add('bounce');
-            
-            // Add more confetti
-            for (let i = 0; i < 50; i++) {
-                createConfetti();
-            }
-        }
-
-        // Create confetti effect
-        function createConfetti() {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.backgroundColor = getRandomColor();
-            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-            document.body.appendChild(confetti);
-            
-            setTimeout(() => {
-                confetti.remove();
-            }, 3000);
-        }
-
-        // Get random color for confetti
-        function getRandomColor() {
-            const colors = ['#6e45e2', '#88d3ce', '#ff7e5f', '#ffd166', '#06d6a0', '#118ab2'];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        // Next level
-        function nextLevel() {
-            gameData.currentLevel++;
-            saveGameData();
-            updateUI();
-            loadLevel(gameData.currentLevel);
-            questionEl.classList.remove('bounce');
-        }
-
-        // Restart game
-        function restartGame() {
-            gameData.currentLevel = 1;
-            gameData.score = 0;
-            saveGameData();
-            updateUI();
-            loadLevel(gameData.currentLevel);
-            questionEl.classList.remove('bounce');
-        }
-
-        // Show hint
-        function showHint() {
-            const hint = gameData.levels[gameData.currentLevel - 1].hint;
-            hintTextEl.textContent = hint;
-            hintContainerEl.style.display = 'block';
-            
-            // Deduct points for using hint
-            if (gameData.score > 0) {
-                gameData.score -= 5;
-                saveGameData();
-                updateUI();
-            }
-        }
-
-        // Toggle admin panel
-        function toggleAdminPanel() {
-            adminPanelEl.style.display = adminPanelEl.style.display === 'none' ? 'block' : 'none';
-        }
-
-        // Add new level
-        function addLevel() {
-            const level = parseInt(adminLevelEl.value);
-            const question = adminQuestionEl.value.trim();
-            const answer = adminAnswerEl.value.trim();
-            const hint = adminHintEl.value.trim();
-            
-            if (!question || !answer) {
-                alert('Pertanyaan dan jawaban harus diisi!');
-                return;
-            }
-            
-            const newLevel = {
-                question,
-                answer: answer.toLowerCase(),
-                hint: hint || 'Tidak ada hint tersedia'
+        function saveToStorage() {
+            const note = {
+                title: document.getElementById('noteTitle').value,
+                content: document.getElementById('editor').value
             };
-            
-            if (level && level <= gameData.levels.length) {
-                // Insert at specific position
-                gameData.levels.splice(level - 1, 0, newLevel);
-            } else {
-                // Add to end
-                gameData.levels.push(newLevel);
-            }
-            
-            saveGameData();
-            alert('Level berhasil ditambahkan!');
-            updateUI();
-            clearAdminForm();
+            localStorage.setItem('note', JSON.stringify(note));
         }
 
-        // Update existing level
-        function updateLevel() {
-            const level = parseInt(adminLevelEl.value);
-            const question = adminQuestionEl.value.trim();
-            const answer = adminAnswerEl.value.trim();
-            const hint = adminHintEl.value.trim();
-            
-            if (!level || level < 1 || level > gameData.levels.length) {
-                alert('Level tidak valid!');
-                return;
-            }
-            
-            if (!question || !answer) {
-                alert('Pertanyaan dan jawaban harus diisi!');
-                return;
-            }
-            
-            gameData.levels[level - 1] = {
-                question,
-                answer: answer.toLowerCase(),
-                hint: hint || gameData.levels[level - 1].hint
-            };
-            
-            saveGameData();
-            alert(`Level ${level} berhasil diperbarui!`);
-            
-            // Jika sedang memainkan level yang diupdate, reload
-            if (gameData.currentLevel === level) {
-                loadLevel(level);
-            }
-            
-            clearAdminForm();
-        }
-
-        // Reset game to default
-        function resetGame() {
-            if (confirm('Apakah Anda yakin ingin mereset game? Semua level custom akan hilang.')) {
-                gameData.levels = [...gameData.defaultLevels];
-                gameData.currentLevel = 1;
-                gameData.score = 0;
-                saveGameData();
-                updateUI();
-                loadLevel(gameData.currentLevel);
-                alert('Game telah direset ke pengaturan awal!');
+        function newNote() {
+            if (confirm('Apakah Anda ingin membuat catatan baru? Perubahan yang belum disimpan akan hilang.')) {
+                document.getElementById('noteTitle').value = '';
+                document.getElementById('editor').value = '';
+                localStorage.removeItem('note');
             }
         }
 
-        // Clear admin form
-        function clearAdminForm() {
-            adminLevelEl.value = '';
-            adminQuestionEl.value = '';
-            adminAnswerEl.value = '';
-            adminHintEl.value = '';
+        function downloadNote() {
+            if (!validateTitle()) return;
+            const text = document.getElementById('editor').value;
+            const title = document.getElementById('noteTitle').value.trim() || 'catatan';
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
-        // Event listeners
-        submitBtn.addEventListener('click', checkAnswer);
-        answerInputEl.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                checkAnswer();
+        function uploadNote(event) {
+            const file = event.target.files[0];
+            if (file && file.type === 'text/plain') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('editor').value = e.target.result;
+                    saveToStorage();
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+                switch (e.key.toLowerCase()) {
+                    case 's':
+                        e.preventDefault();
+                        saveNote();
+                        break;
+                    case 'n':
+                        e.preventDefault();
+                        newNote();
+                        break;
+                    case 'z':
+                        document.execCommand('undo');
+                        break;
+                    case 'y':
+                        document.execCommand('redo');
+                        break;
+                }
             }
         });
-        hintBtn.addEventListener('click', showHint);
-        nextLevelBtn.addEventListener('click', nextLevel);
-        restartGameBtn.addEventListener('click', restartGame);
-        toggleAdminBtn.addEventListener('click', toggleAdminPanel);
-        addLevelBtn.addEventListener('click', addLevel);
-        updateLevelBtn.addEventListener('click', updateLevel);
-        resetGameBtn.addEventListener('click', resetGame);
-
-        // Initialize the game
-        initGame();
     </script>
 </body>
 </html>
