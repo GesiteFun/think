@@ -53,6 +53,7 @@
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
         }
 
         /* Sidebar Styles */
@@ -179,6 +180,9 @@
             max-width: 100%;
             padding: 20px;
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 60px);
         }
 
         .header {
@@ -281,6 +285,37 @@
             font-weight: bold;
         }
 
+        /* Undo/Redo Buttons */
+        .undo-redo-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .undo-btn, .redo-btn {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .undo-btn:hover, .redo-btn:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .undo-btn:disabled, .redo-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Copy Button */
         .copy-btn {
             background-color: rgba(255, 255, 255, 0.15);
@@ -338,6 +373,7 @@
             color: var(--text-color);
             resize: vertical;
             line-height: 1.7;
+            flex: 1;
         }
 
         .editor:focus {
@@ -349,6 +385,15 @@
             color: var(--placeholder-color);
             font-style: italic;
             opacity: 0.7;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            margin-top: auto;
         }
 
         /* Control Buttons Container */
@@ -449,6 +494,7 @@
 
             .container {
                 padding: 15px;
+                min-height: calc(100vh - 90px);
             }
             
             .note-title-input {
@@ -487,6 +533,11 @@
                 margin-left: 0;
                 width: 100%;
                 justify-content: flex-end;
+            }
+
+            .footer {
+                padding: 10px;
+                font-size: 0.8rem;
             }
         }
 
@@ -534,6 +585,16 @@
                         <span class="btn-text">Simpan (Ctrl+S)</span>
                     </button>
                     
+                    <!-- Undo/Redo Controls -->
+                    <div class="undo-redo-controls">
+                        <button class="undo-btn" id="undoBtn" aria-label="Undo" disabled>
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="redo-btn" id="redoBtn" aria-label="Redo" disabled>
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                    
                     <!-- Text Controls -->
                     <div class="text-controls">
                         <!-- Font Size Controls -->
@@ -575,6 +636,11 @@
                 </div>
             </div>
             <textarea class="editor" id="editor" placeholder="Mulai mengetik di sini... ✨\n\nTips:\n- Gunakan Ctrl+S untuk menyimpan\n- Klik ikon bulan untuk tema gelap\n- Drag sudut textarea untuk mengubah ukuran" aria-label="Editor catatan"></textarea>
+            
+            <!-- Footer -->
+            <div class="footer">
+                &copy; 2025 Notepad Pro | Fawwaz Dzaky
+            </div>
         </div>
     </div>
 
@@ -610,10 +676,14 @@
         const fontSizeDisplay = document.getElementById('fontSizeDisplay');
         const fontWeightBtn = document.getElementById('fontWeightBtn');
         const copyBtn = document.getElementById('copyBtn');
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
         
         let notes = [];
         let currentNoteId = null;
         let typingTimer;
+        let history = [];
+        let historyIndex = -1;
 
         // Initialize the app
         function init() {
@@ -647,6 +717,71 @@
                 editor.style.fontWeight = savedFontWeight;
                 fontWeightBtn.classList.toggle('active', savedFontWeight === 'bold');
             }
+            
+            // Initialize history
+            saveHistory();
+        }
+
+        // History management
+        function saveHistory() {
+            // Remove any history after current index
+            history = history.slice(0, historyIndex + 1);
+            
+            // Add new state to history
+            const state = {
+                content: editor.value,
+                cursorPos: editor.selectionStart
+            };
+            
+            history.push(state);
+            historyIndex = history.length - 1;
+            
+            // Update undo/redo buttons
+            updateUndoRedoButtons();
+        }
+
+        function undo() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                applyHistoryState();
+            }
+        }
+
+        function redo() {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                applyHistoryState();
+            }
+        }
+
+        function applyHistoryState() {
+            const state = history[historyIndex];
+            editor.value = state.content;
+            
+            // Restore cursor position
+            setTimeout(() => {
+                editor.selectionStart = state.cursorPos;
+                editor.selectionEnd = state.cursorPos;
+            }, 0);
+            
+            // Update undo/redo buttons
+            updateUndoRedoButtons();
+            
+            // Save to note if applicable
+            if (currentNoteId) {
+                const noteIndex = notes.findIndex(n => n.id === currentNoteId);
+                if (noteIndex !== -1) {
+                    notes[noteIndex].content = editor.value;
+                    notes[noteIndex].updatedAt = new Date().toISOString();
+                    saveNotes();
+                    renderNotesList();
+                }
+            }
+        }
+
+        function updateUndoRedoButtons() {
+            undoBtn.disabled = historyIndex <= 0;
+            redoBtn.disabled = historyIndex >= history.length - 1;
         }
 
         // Load notes from localStorage
@@ -738,6 +873,14 @@
                 editor.value = note.content;
                 updateDocumentTitle();
                 renderNotesList();
+                
+                // Reset history for new note
+                history = [{
+                    content: note.content,
+                    cursorPos: 0
+                }];
+                historyIndex = 0;
+                updateUndoRedoButtons();
             }
         }
 
@@ -976,7 +1119,11 @@
             // Copy button
             copyBtn.addEventListener('click', copyText);
             
-            // Title and editor input events
+            // Undo/Redo buttons
+            undoBtn.addEventListener('click', undo);
+            redoBtn.addEventListener('click', redo);
+            
+            // Title input events
             noteTitle.addEventListener('input', () => {
                 updateDocumentTitle();
                 if (currentNoteId) {
@@ -990,6 +1137,7 @@
                 }
             });
             
+            // Editor input events
             editor.addEventListener('input', () => {
                 if (currentNoteId) {
                     const noteIndex = notes.findIndex(n => n.id === currentNoteId);
@@ -1001,13 +1149,19 @@
                     }
                 }
                 
-                // Show saving status
-                showSavingStatus();
+                // Save history state after a short delay
                 clearTimeout(typingTimer);
                 typingTimer = setTimeout(() => {
+                    saveHistory();
+                }, 500);
+                
+                // Show saving status
+                showSavingStatus();
+                setTimeout(() => {
                     hideSavingStatus();
                 }, 1000);
             });
+            
             
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
