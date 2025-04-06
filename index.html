@@ -1181,6 +1181,16 @@
             showToast('Teks berhasil disalin!');
         }
 
+        // Word count functions
+        function updateWordCount() {
+            const text = editor.value;
+            const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const charCount = text.length;
+            
+            document.getElementById('wordCount').textContent = `${wordCount} kata`;
+            document.getElementById('charCount').textContent = `${charCount} karakter`;
+        }
+
         // Show saving status
         function showSavingStatus() {
             saveStatus.classList.add('show');
@@ -1215,6 +1225,24 @@
             document.title = '✍️ Notepad Pro';
         }
 
+        // Setup search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('searchNotes');
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const noteItems = document.querySelectorAll('.note-item');
+                
+                noteItems.forEach(item => {
+                    const title = item.querySelector('.note-title').textContent.toLowerCase();
+                    if (title.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+
         // Setup event listeners
         function setupEventListeners() {
             // Toggle sidebar
@@ -1223,8 +1251,9 @@
             // Toggle theme
             themeToggle.addEventListener('click', toggleTheme);
             
-            // Add new note button
+            // Add new note buttons
             addNoteBtn.addEventListener('click', createNewNote);
+            newNoteBtn.addEventListener('click', createNewNote);
             
             // Font size controls
             increaseFontBtn.addEventListener('click', increaseFontSize);
@@ -1254,8 +1283,10 @@
                 }
             });
             
-            // Editor input events
+            // Editor input events with throttling
             editor.addEventListener('input', () => {
+                updateWordCount();
+                
                 if (currentNoteId) {
                     const noteIndex = notes.findIndex(n => n.id === currentNoteId);
                     if (noteIndex !== -1) {
@@ -1271,15 +1302,9 @@
                 typingTimer = setTimeout(() => {
                     saveHistory();
                 }, 500);
-                
-                // Show saving status
-                showSavingStatus();
-                setTimeout(() => {
-                    hideSavingStatus();
-                }, 1000);
             });
-           
-                          // Keyboard shortcuts
+            
+            // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && !e.altKey) {
                     switch (e.key.toLowerCase()) {
@@ -1295,6 +1320,19 @@
                             e.preventDefault();
                             toggleFontWeight();
                             break;
+                        case 'z':
+                            if (e.shiftKey) {
+                                e.preventDefault();
+                                redo();
+                            } else {
+                                e.preventDefault();
+                                undo();
+                            }
+                            break;
+                        case 'y':
+                            e.preventDefault();
+                            redo();
+                            break;
                         case 'c':
                             if (e.shiftKey) {
                                 e.preventDefault();
@@ -1304,12 +1342,23 @@
                     }
                 }
             });
+            
+            // Setup search
+            setupSearch();
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    e.target !== menuToggleBtn) {
+                    sidebar.classList.remove('show-mobile');
+                }
+            });
         }
 
         // Initialize the app
         window.addEventListener('DOMContentLoaded', () => {
             init();
-            startAutoSave();
         });
     </script>
 </body>
