@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notepad Pro</title>
+    <title>✍️ Notepad Pro with Sidebar</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Google Fonts - Inter -->
@@ -53,7 +53,6 @@
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
-            overflow-x: hidden;
         }
 
         /* Sidebar Styles */
@@ -68,13 +67,14 @@
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            transition: width 0.3s ease;
+            transition: transform 0.3s ease;
             overflow: hidden;
             z-index: 10;
         }
 
         .sidebar.collapsed {
-            width: 60px;
+            transform: translateX(-100%);
+            width: 0;
         }
 
         .sidebar-header {
@@ -89,12 +89,6 @@
         .sidebar-title {
             font-weight: 600;
             white-space: nowrap;
-            opacity: 1;
-            transition: opacity 0.2s ease;
-        }
-
-        .sidebar.collapsed .sidebar-title {
-            opacity: 0;
         }
 
         .sidebar-content {
@@ -149,17 +143,6 @@
             opacity: 1;
         }
 
-        .sidebar.collapsed .note-item {
-            justify-content: center;
-            padding: 15px;
-        }
-
-        .sidebar.collapsed .note-title,
-        .sidebar.collapsed .note-date,
-        .sidebar.collapsed .delete-btn {
-            display: none;
-        }
-
         .add-note-btn {
             padding: 12px 15px;
             margin: 10px;
@@ -179,35 +162,6 @@
             background-color: #3a7bc8;
         }
 
-        .sidebar.collapsed .add-note-btn {
-            justify-content: center;
-            padding: 15px;
-        }
-
-        .sidebar.collapsed .add-note-btn span {
-            display: none;
-        }
-
-        /* Toggle Button */
-        .toggle-btn {
-            background: none;
-            border: none;
-            color: var(--text-color);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .toggle-btn:hover {
-            background-color: rgba(0, 0, 0, 0.1);
-        }
-
         /* Main Content */
         .main-content {
             flex: 1;
@@ -217,7 +171,7 @@
         }
 
         .sidebar.collapsed + .main-content {
-            margin-left: -190px;
+            margin-left: 0;
         }
 
         .container {
@@ -308,10 +262,17 @@
             opacity: 0.7;
         }
 
-        #theme-toggle {
+        /* Control Buttons Container */
+        .control-buttons {
             position: fixed;
             bottom: 24px;
             right: 24px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .control-btn {
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -323,9 +284,15 @@
             color: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             cursor: pointer;
-            z-index: 100;
+            border: none;
+            transition: all 0.3s ease;
         }
 
+        .control-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Toast and Save Status */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -384,14 +351,11 @@
 
             .sidebar.show-mobile {
                 left: 0;
+                width: 80%;
             }
 
             .main-content {
                 margin-left: 0 !important;
-            }
-
-            .mobile-menu-btn {
-                display: block !important;
             }
 
             .container {
@@ -420,6 +384,17 @@
                 top: 10px;
                 right: 10px;
             }
+
+            .control-buttons {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .control-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -431,46 +406,14 @@
                 margin-right: 0;
                 font-size: 1em;
             }
-            
-            #theme-toggle {
-                width: 44px;
-                height: 44px;
-                font-size: 1rem;
-            }
-        }
-
-        /* Mobile Menu Button */
-        .mobile-menu-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1100;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
-    <!-- Mobile Menu Button (hidden on desktop) -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn">
-        <i class="fas fa-bars"></i>
-    </button>
-
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-title">Catatan Saya</div>
-            <button class="toggle-btn" id="toggleBtn">
-                <i class="fas fa-bars"></i>
-            </button>
         </div>
         
         <div class="sidebar-content" id="notesList">
@@ -505,10 +448,17 @@
                 </div>
             </div>
             <textarea class="editor" id="editor" placeholder="Mulai mengetik di sini... ✨\n\nTips:\n- Gunakan Ctrl+S untuk menyimpan\n- Klik ikon bulan untuk tema gelap\n- Drag sudut textarea untuk mengubah ukuran" aria-label="Editor catatan"></textarea>
-            <button class="btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle tema gelap/terang">
-                <i class="fas fa-moon"></i>
-            </button>
         </div>
+    </div>
+
+    <!-- Control Buttons -->
+    <div class="control-buttons">
+        <button class="control-btn" id="menuToggleBtn" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <button class="control-btn" id="themeToggle" aria-label="Toggle tema gelap/terang">
+            <i class="fas fa-moon"></i>
+        </button>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -520,13 +470,12 @@
     <script>
         // DOM Elements
         const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('toggleBtn');
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
         const notesList = document.getElementById('notesList');
         const addNoteBtn = document.getElementById('addNoteBtn');
         const noteTitle = document.getElementById('noteTitle');
         const editor = document.getElementById('editor');
-        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggle = document.getElementById('themeToggle');
         const toast = document.getElementById('toast');
         const saveStatus = document.getElementById('saveStatus');
         
@@ -547,8 +496,11 @@
                 themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
             }
             
-            // Check mobile view
-            checkMobileView();
+            // Load sidebar state
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+            }
         }
 
         // Load notes from localStorage
@@ -754,9 +706,13 @@
             reader.readAsText(file);
         }
 
-        // Toggle sidebar collapse
+        // Toggle sidebar
         function toggleSidebar() {
             sidebar.classList.toggle('collapsed');
+            
+            // Save sidebar state to localStorage
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
         }
 
         // Toggle theme
@@ -807,27 +763,13 @@
             document.title = '✍️ Notepad Pro';
         }
 
-        // Check if mobile view
-        function checkMobileView() {
-            if (window.innerWidth <= 768) {
-                sidebar.classList.remove('collapsed');
-                sidebar.classList.add('show-mobile');
-                mobileMenuBtn.style.display = 'flex';
-            } else {
-                sidebar.classList.remove('show-mobile');
-                mobileMenuBtn.style.display = 'none';
-            }
-        }
-
         // Setup event listeners
         function setupEventListeners() {
             // Toggle sidebar
-            toggleBtn.addEventListener('click', toggleSidebar);
+            menuToggleBtn.addEventListener('click', toggleSidebar);
             
-            // Mobile menu button
-            mobileMenuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('show-mobile');
-            });
+            // Toggle theme
+            themeToggle.addEventListener('click', toggleTheme);
             
             // Add new note button
             addNoteBtn.addEventListener('click', createNewNote);
@@ -880,9 +822,6 @@
                     }
                 }
             });
-            
-            // Window resize for mobile view
-            window.addEventListener('resize', checkMobileView);
         }
 
         // Initialize the app
