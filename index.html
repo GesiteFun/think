@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tebak Kata - 150 Level</title>
+    <title>Tebak Kata - Mini Game</title>
     <style>
         :root {
-            --primary: #6a11cb;
-            --secondary: #2575fc;
-            --accent: #ff8a00;
-            --light: #ffffff;
-            --dark: #1a1a2e;
-            --success: #4ade80;
-            --error: #f87171;
+            --primary: #6e45e2;
+            --secondary: #88d3ce;
+            --accent: #ff7e5f;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
         }
 
         * {
@@ -25,24 +26,23 @@
         body {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             min-height: 100vh;
-            color: var(--light);
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 2rem;
-            overflow-x: hidden;
+            padding: 20px;
+            color: var(--light);
         }
 
         .container {
-            width: 100%;
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 2rem;
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             animation: fadeIn 0.5s ease-out;
-            margin-bottom: 2rem;
+            transition: all 0.3s ease;
         }
 
         @keyframes fadeIn {
@@ -52,222 +52,162 @@
 
         h1 {
             text-align: center;
-            margin-bottom: 1.5rem;
-            font-size: 2.5rem;
-            background: linear-gradient(to right, var(--light), var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .game-info {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 1.5rem;
-            font-size: 1.1rem;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .level-display {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            font-weight: bold;
+            font-size: 1.2rem;
+            font-weight: 600;
         }
 
-        .hint-btn {
-            background: linear-gradient(to right, var(--accent), #ff5e00);
-            border: none;
-            color: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 138, 0, 0.3);
-        }
-
-        .hint-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 138, 0, 0.4);
-        }
-
-        .hint-btn:active {
-            transform: translateY(0);
+        .score-display {
+            font-size: 1.2rem;
+            font-weight: 600;
         }
 
         .question-container {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 25px;
             border-radius: 15px;
-            margin-bottom: 2rem;
+            margin-bottom: 25px;
             text-align: center;
             min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            animation: pulse 2s infinite alternate;
+            animation: fadeIn 0.7s ease-out;
         }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 rgba(255, 255, 255, 0.1); }
-            100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+        .question {
+            font-size: 1.5rem;
+            font-weight: 600;
+            word-wrap: break-word;
         }
 
         .answer-container {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
         .answer-input {
-            padding: 1rem;
+            padding: 15px;
+            border: none;
             border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
             font-size: 1.1rem;
-            outline: none;
+            background: rgba(255, 255, 255, 0.8);
             transition: all 0.3s ease;
+            width: 100%;
         }
 
         .answer-input:focus {
-            border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .answer-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .submit-btn {
-            background: linear-gradient(to right, var(--secondary), var(--primary));
-            border: none;
-            color: white;
-            padding: 1rem;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3);
-        }
-
-        .submit-btn:hover {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(110, 69, 226, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4);
         }
 
-        .submit-btn:active {
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ff6a45;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 126, 95, 0.4);
+        }
+
+        .btn-primary:active {
             transform: translateY(0);
         }
 
-        .result-message {
-            text-align: center;
-            margin-top: 1rem;
-            min-height: 24px;
-            font-weight: bold;
-            transition: all 0.3s ease;
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
         }
 
-        .success {
-            color: var(--success);
-            animation: bounce 0.5s;
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .error {
-            color: var(--error);
-            animation: shake 0.5s;
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
-
-        .hint-text {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 1rem;
+        .hint-container {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 15px;
             border-radius: 10px;
-            margin-top: 1rem;
             display: none;
             animation: fadeIn 0.5s ease-out;
         }
 
-        .level-selection {
+        .hint-text {
+            font-style: italic;
+        }
+
+        .level-complete {
             display: none;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 0.5rem;
-            margin-top: 1rem;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
+            text-align: center;
+            animation: zoomIn 0.5s ease-out;
         }
 
-        .level-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        .level-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+        .level-complete h2 {
+            color: var(--success);
+            margin-bottom: 15px;
         }
 
-        .level-btn.completed {
-            background: linear-gradient(135deg, var(--success), #16a34a);
+        .game-complete {
+            display: none;
+            text-align: center;
+            animation: zoomIn 0.5s ease-out;
         }
 
-        .level-btn.current {
-            background: linear-gradient(135deg, var(--accent), #ff5e00);
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
-        }
-
-        .toggle-levels {
-            background: rgba(0, 0, 0, 0.3);
-            border: none;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-levels:hover {
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        .toggle-levels i {
-            transition: transform 0.3s ease;
-        }
-
-        .toggle-levels.active i {
-            transform: rotate(180deg);
+        .game-complete h2 {
+            color: var(--accent);
+            margin-bottom: 15px;
         }
 
         .confetti {
@@ -276,44 +216,114 @@
             height: 10px;
             background-color: var(--accent);
             opacity: 0;
-            z-index: 1000;
-            animation: confetti-fall 3s ease-in-out forwards;
+            animation: confetti 3s ease-in-out infinite;
         }
 
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
 
-        @media (max-width: 600px) {
+        .admin-panel {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .admin-panel h3 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .admin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .admin-input {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .admin-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-btn:hover {
+            background: #5d38c7;
+        }
+
+        .toggle-admin {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-admin:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
             .container {
-                padding: 1.5rem;
+                padding: 20px;
             }
-
-            h1 {
-                font-size: 2rem;
+            
+            .action-buttons {
+                flex-direction: column;
             }
-
+            
+            .btn {
+                width: 100%;
+            }
+            
             .game-info {
                 flex-direction: column;
-                gap: 1rem;
-                align-items: center;
+                gap: 10px;
+                text-align: center;
             }
+        }
 
-            .level-selection {
-                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-            }
+        /* Animasi tambahan */
+        .bounce {
+            animation: bounce 0.5s;
+        }
 
-            .level-btn {
-                width: 45px;
-                height: 45px;
-            }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
         }
     </style>
 </head>
@@ -322,215 +332,510 @@
         <h1>Tebak Kata</h1>
         
         <div class="game-info">
-            <div class="level-display">Level <span id="current-level">1</span>/150</div>
-            <button class="hint-btn" id="hint-btn">Petunjuk</button>
+            <div class="level-display">Level: <span id="current-level">1</span>/<span id="total-levels">30</span></div>
+            <div class="score-display">Skor: <span id="score">0</span></div>
         </div>
         
         <div class="question-container">
-            <p id="question-text">Memuat pertanyaan...</p>
+            <div class="question" id="question">Memuat pertanyaan...</div>
         </div>
         
         <div class="answer-container">
             <input type="text" class="answer-input" id="answer-input" placeholder="Masukkan jawaban Anda...">
-            <button class="submit-btn" id="submit-btn">Submit</button>
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="submit-btn">Submit</button>
+                <button class="btn btn-secondary" id="hint-btn">Hint</button>
+            </div>
         </div>
         
-        <div class="result-message" id="result-message"></div>
+        <div class="hint-container" id="hint-container">
+            <p class="hint-text" id="hint-text">Hint akan muncul di sini</p>
+        </div>
         
-        <div class="hint-text" id="hint-text"></div>
+        <div class="level-complete" id="level-complete">
+            <h2>Level Selesai!</h2>
+            <p>Jawaban yang benar: <span id="correct-answer"></span></p>
+            <button class="btn btn-primary" id="next-level-btn">Level Berikutnya</button>
+        </div>
         
-        <button class="toggle-levels" id="toggle-levels">
-            <span>Pilih Level</span>
-            <i>▼</i>
-        </button>
+        <div class="game-complete" id="game-complete">
+            <h2>Selamat! Anda Menyelesaikan Semua Level!</h2>
+            <p>Skor akhir Anda: <span id="final-score">0</span></p>
+            <button class="btn btn-primary" id="restart-game-btn">Main Lagi</button>
+        </div>
         
-        <div class="level-selection" id="level-selection"></div>
+        <div class="admin-panel" id="admin-panel">
+            <h3>Admin Panel</h3>
+            <div class="admin-form">
+                <input type="number" class="admin-input" id="admin-level" placeholder="Level">
+                <input type="text" class="admin-input" id="admin-question" placeholder="Pertanyaan">
+                <input type="text" class="admin-input" id="admin-answer" placeholder="Jawaban">
+                <input type="text" class="admin-input" id="admin-hint" placeholder="Hint">
+                <button class="admin-btn" id="add-level-btn">Tambah Level</button>
+                <button class="admin-btn" id="update-level-btn">Update Level</button>
+                <button class="admin-btn" id="reset-game-btn">Reset Game</button>
+            </div>
+        </div>
     </div>
-
+    
+    <button class="toggle-admin" id="toggle-admin">A</button>
+    
     <script>
-        // Data pertanyaan dan jawaban untuk 150 level
-        const gameData = [
-            { question: "Binatang yang suka mengeluarkan suara 'meong'", answer: "kucing", hint: "Binatang peliharaan yang lucu" },
-            { question: "Buah berwarna merah yang sering dijadikan jus", answer: "apel", hint: "Ada yang hijau dan merah" },
-            { question: "Ibu kota Indonesia", answer: "jakarta", hint: "Terletak di pulau Jawa" },
-            { question: "Alat untuk memotong kertas", answer: "gunting", hint: "Ada yang besar dan kecil" },
-            { question: "Warna daun biasanya", answer: "hijau", hint: "Warna alam" },
-            { question: "Satuan waktu lebih kecil dari menit", answer: "detik", hint: "60 ... dalam satu menit" },
-            { question: "Tempat untuk menyimpan uang", answer: "bank", hint: "Bisa menabung di sini" },
-            { question: "Alat transportasi udara", answer: "pesawat", hint: "Bisa terbang tinggi" },
-            { question: "Makanan pokok orang Indonesia", answer: "nasi", hint: "Ditanam di sawah" },
-            { question: "Benda bundar untuk bermain bola", answer: "bola", hint: "Ada banyak jenis olahraganya" },
-            { question: "Tempat untuk mandi di rumah", answer: "kamar mandi", hint: "Ada shower atau bak" },
-            { question: "Alat untuk menulis di papan tulis", answer: "kapur", hint: "Bisa juga spidol" },
-            { question: "Binatang yang memiliki belalai", answer: "gajah", hint: "Hewan besar berbelalai" },
-            { question: "Buah dengan banyak duri di kulitnya", answer: "durian", hint: "Raja buah" },
-            { question: "Tempat untuk berenang", answer: "kolam renang", hint: "Bisa di dalam atau luar ruangan" },
-            { question: "Alat untuk melihat benda kecil", answer: "mikroskop", hint: "Digunakan di laboratorium" },
-            { question: "Warna langit di siang hari", answer: "biru", hint: "Warna cerah" },
-            { question: "Satuan panjang lebih kecil dari meter", answer: "sentimeter", hint: "100 ... = 1 meter" },
-            { question: "Tempat untuk membeli obat", answer: "apotek", hint: "Dikelola oleh apoteker" },
-            { question: "Alat transportasi air", answer: "kapal", hint: "Bisa mengarungi samudera" },
-            { question: "Minuman dari biji kopi", answer: "kopi", hint: "Bisa membuat melek" },
-            { question: "Benda untuk menghitung", answer: "kalkulator", hint: "Alat hitung elektronik" },
-            { question: "Tempat untuk tidur di rumah", answer: "kamar tidur", hint: "Ada kasur di dalamnya" },
-            { question: "Alat untuk menggambar", answer: "pensil", hint: "Bisa dihapus" },
-            { question: "Binatang yang bisa terbang di malam hari", answer: "kelelawar", hint: "Menggunakan sonar" },
-            { question: "Buah yang bisa dijadikan saus tomat", answer: "tomat", hint: "Bisa sayur bisa buah" },
-            { question: "Tempat untuk bermain sepak bola", answer: "lapangan", hint: "Berumput hijau" },
-            { question: "Alat untuk memotong rumput", answer: "sabit", hint: "Juga alat pertanian" },
-            { question: "Warna bunga matahari", answer: "kuning", hint: "Warna cerah menyala" },
-            { question: "Satuan berat lebih kecil dari kilogram", answer: "gram", hint: "1000 ... = 1 kg" },
-            { question: "Tempat untuk meminjam buku", answer: "perpustakaan", hint: "Penuh dengan buku" },
-            { question: "Alat transportasi darat beroda dua", answer: "sepeda", hint: "Dikayuh dengan kaki" },
-            { question: "Makanan dari tepung yang direbus", answer: "mie", hint: "Ada instannya" },
-            { question: "Benda untuk menunjuk arah", answer: "kompas", hint: "Selalu menunjuk utara" },
-            { question: "Tempat untuk memasak di rumah", answer: "dapur", hint: "Ada kompornya" },
-            { question: "Alat untuk memotong kayu", answer: "gergaji", hint: "Bermata tajam" },
-            { question: "Binatang yang hidup di air dan darat", answer: "katak", hint: "Bisa melompat" },
-            { question: "Buah yang kulitnya berduri tapi isinya manis", answer: "nanas", hint: "Bisa untuk rujak" },
-            { question: "Tempat untuk menonton film", answer: "bioskop", hint: "Layar lebar" },
-            { question: "Alat untuk mengukur suhu", answer: "termometer", hint: "Digunakan saat demam" },
-            { question: "Warna salju", answer: "putih", hint: "Warna bersih" },
-            { question: "Satuan waktu lebih kecil dari detik", answer: "milidetik", hint: "1/1000 detik" },
-            { question: "Tempat untuk berobat", answer: "rumah sakit", hint: "Dikelola dokter" },
-            { question: "Alat transportasi bawah tanah", answer: "kereta bawah tanah", hint: "Subway" },
-            { question: "Minuman dari daun teh", answer: "teh", hint: "Ada yang dingin dan panas" },
-            { question: "Benda untuk melihat waktu", answer: "jam", hint: "Ada digital dan analog" },
-            { question: "Tempat untuk menyimpan pakaian", answer: "lemari", hint: "Bisa kayu atau plastik" },
-            { question: "Alat untuk menulis di kertas", answer: "pulpen", hint: "Berisi tinta" },
-            { question: "Binatang yang memiliki punuk", answer: "unta", hint: "Hidup di gurun" },
-            { question: "Buah kecil berwarna ungu atau hijau", answer: "anggur", hint: "Bisa dibuat wine" },
-            { question: "Tempat untuk berolahraga", answer: "gym", hint: "Banyak alat fitnes" },
-            { question: "Alat untuk membuka botol", answer: "pembuka botol", hint: "Biasa untuk bir" },
-            { question: "Warna coklat susu", answer: "coklat", hint: "Warna makanan manis" },
-            { question: "Satuan panjang lebih kecil dari sentimeter", answer: "milimeter", hint: "10 ... = 1 cm" },
-            { question: "Tempat untuk membeli sayur", answer: "pasar", hint: "Tradisional atau modern" },
-            { question: "Alat transportasi udara kecil", answer: "helikopter", hint: "Baling-baling di atas" },
-            { question: "Makanan dari kedelai fermentasi", answer: "tempe", hint: "Makanan khas Indonesia" },
-            { question: "Benda untuk mendengar musik", answer: "earphone", hint: "Dipasang di telinga" },
-            { question: "Tempat untuk berkumpul keluarga", answer: "ruang keluarga", hint: "Ada TV biasanya" },
-            { question: "Alat untuk mengukur tekanan darah", answer: "tensimeter", hint: "Digunakan dokter" },
-            { question: "Binatang yang bisa berubah warna", answer: "bunglon", hint: "Menyesuaikan lingkungan" },
-            { question: "Buah yang memiliki biji di luar", answer: "strawberry", hint: "Warna merah" },
-            { question: "Tempat untuk belajar di sekolah", answer: "kelas", hint: "Ada meja dan kursi" },
-            { question: "Alat untuk melihat bintang", answer: "teleskop", hint: "Digunakan astronom" },
-            { question: "Warna api", answer: "merah", hint: "Juga oranye dan kuning" },
-            { question: "Satuan berat lebih kecil dari gram", answer: "miligram", hint: "1000 ... = 1 gram" },
-            { question: "Tempat untuk memarkir mobil", answer: "garasi", hint: "Bisa tertutup atau terbuka" },
-            { question: "Alat transportasi beroda banyak", answer: "kereta api", hint: "Berjalan di rel" },
-            { question: "Minuman berkarbonasi", answer: "soda", hint: "Ada banyak rasa" },
-            { question: "Benda untuk menangkap ikan", answer: "pancing", hint: "Memakai umpan" },
-            { question: "Tempat untuk menjemur pakaian", answer: "jemuran", hint: "Biasa di luar rumah" },
-            { question: "Alat untuk mengukur waktu", answer: "stopwatch", hint: "Digunakan atlet" },
-            { question: "Binatang yang memiliki cangkang", answer: "kura-kura", hint: "Bergerak lambat" },
-            { question: "Buah yang memiliki duri di kulitnya", answer: "salak", hint: "Kulit seperti ular" },
-            { question: "Tempat untuk bermain bulu tangkis", answer: "lapangan bulu tangkis", hint: "Ada net di tengah" },
-            { question: "Alat untuk memotong kuku", answer: "gunting kuku", hint: "Kecil dan tajam" },
-            { question: "Warna daun saat musim gugur", answer: "coklat", hint: "Warna kering" },
-            { question: "Satuan suhu", answer: "derajat", hint: "Celsius atau Fahrenheit" },
-            { question: "Tempat untuk membeli obat tradisional", answer: "jamu", hint: "Warisan nenek moyang" },
-            { question: "Alat transportasi tanpa mesin", answer: "perahu dayung", hint: "Digunakan dengan dayung" },
-            { question: "Makanan dari fermentasi susu", answer: "yogurt", hint: "Baik untuk pencernaan" },
-            { question: "Benda untuk mengeringkan rambut", answer: "hair dryer", hint: "Mengeluarkan angin panas" },
-            { question: "Tempat untuk menyimpan mobil", answer: "garasi", hint: "Bisa menampung kendaraan" },
-            { question: "Alat untuk mengukur kelembaban", answer: "higrometer", hint: "Digunakan di laboratorium" },
-            { question: "Binatang yang bisa terbang tinggi", answer: "elang", hint: "Pemangsa di udara" },
-            { question: "Buah yang bisa dijadikan minyak", answer: "zaitun", hint: "Dari Timur Tengah" },
-            { question: "Tempat untuk bermain basket", answer: "lapangan basket", hint: "Ada ringnya" },
-            { question: "Alat untuk membersihkan debu", answer: "kemoceng", hint: "Bulu ayam" },
-            { question: "Warna langit saat matahari terbenam", answer: "jingga", hint: "Warna senja" },
-            { question: "Satuan volume cairan", answer: "liter", hint: "Untuk mengukur cairan" },
-            { question: "Tempat untuk beribadah umat Islam", answer: "masjid", hint: "Ada menara" },
-            { question: "Alat transportasi darat beroda empat", answer: "mobil", hint: "Bisa pribadi atau umum" },
-            { question: "Minuman dari biji kakao", answer: "coklat", hint: "Bisa panas atau dingin" },
-            { question: "Benda untuk mengukur panjang", answer: "penggaris", hint: "Biasa 30 cm" },
-            { question: "Tempat untuk mencuci piring", answer: "tempat cuci piring", hint: "Ada di dapur" },
-            { question: "Alat untuk mengukur kecepatan", answer: "speedometer", hint: "Ada di kendaraan" },
-            { question: "Binatang yang bisa memanjat pohon", answer: "monyet", hint: "Mirip manusia" },
-            { question: "Buah yang memiliki biji hitam kecil", answer: "semangka", hint: "Banyak airnya" },
-            { question: "Tempat untuk bermain tenis", answer: "lapangan tenis", hint: "Ada net di tengah" },
-            { question: "Alat untuk mengukur kedalaman laut", answer: "sonar", hint: "Menggunakan gelombang" },
-            { question: "Warna pelangi ketiga", answer: "kuning", hint: "Setelah merah dan jingga" },
-            { question: "Satuan intensitas cahaya", answer: "kandela", hint: "Untuk mengukur terang" },
-            { question: "Tempat untuk beribadah umat Kristen", answer: "gereja", hint: "Ada menara lonceng" },
-            { question: "Alat transportasi udara besar", answer: "pesawat terbang", hint: "Bisa menampung banyak orang" },
-            { question: "Makanan dari tepung yang dipanggang", answer: "roti", hint: "Bisa isi coklat" },
-            { question: "Benda untuk melihat jarak jauh", answer: "teropong", hint: "Digunakan di kapal" },
-            { question: "Tempat untuk menyimpan sepatu", answer: "rak sepatu", hint: "Biasa di dekat pintu" },
-            { question: "Alat untuk mengukur tekanan udara", answer: "barometer", hint: "Untuk prakiraan cuaca" },
-            { question: "Binatang yang bisa berenang cepat", answer: "lumba-lumba", hint: "Mamalia laut cerdas" },
-            { question: "Buah yang bisa dijadikan selai", answer: "blueberry", hint: "Kecil berwarna biru" },
-            { question: "Tempat untuk bermain golf", answer: "lapangan golf", hint: "Ada lubang-lubang" },
-            { question: "Alat untuk mengukur arus listrik", answer: "amperemeter", hint: "Bagian dari multimeter" },
-            { question: "Warna daun muda", answer: "hijau muda", hint: "Warna segar" },
-            { question: "Satuan frekuensi", answer: "hertz", hint: "Untuk mengukur getaran" },
-            { question: "Tempat untuk beribadah umat Hindu", answer: "pura", hint: "Banyak di Bali" },
-            { question: "Alat transportasi air kecil", answer: "perahu", hint: "Bisa dari kayu" },
-            { question: "Minuman dari buah jeruk", answer: "jus jeruk", hint: "Kaya vitamin C" },
-            { question: "Benda untuk mengukur suhu tubuh", answer: "termometer", hint: "Bisa digital" },
-            { question: "Tempat untuk menyimpan buku", answer: "rak buku", hint: "Bisa beberapa tingkat" },
-            { question: "Alat untuk mengukur kekuatan gempa", answer: "seismometer", hint: "Mencatat getaran" },
-            { question: "Binatang yang bisa menggonggong", answer: "anjing", hint: "Sahabat manusia" },
-            { question: "Buah yang bisa dijadikan wine", answer: "anggur", hint: "Ada merah dan putih" },
-            { question: "Tempat untuk bermain voli", answer: "lapangan voli", hint: "Ada net di tengah" },
-            { question: "Alat untuk mengukur pH", answer: "pH meter", hint: "Untuk mengukur keasaman" },
-            { question: "Warna bunga mawar yang berarti cinta", answer: "merah", hint: "Warna romantis" },
-            { question: "Satuan daya", answer: "watt", hint: "Untuk mengukur kekuatan" },
-            { question: "Tempat untuk beribadah umat Buddha", answer: "vihara", hint: "Ada patung Buddha" },
-            { question: "Alat transportasi darat beroda tiga", answer: "becak", hint: "Ada yang motor atau kayuh" },
-            { question: "Makanan dari tepung yang digoreng", answer: "donat", hint: "Bentuk lingkaran" },
-            { question: "Benda untuk melihat mikroorganisme", answer: "mikroskop", hint: "Pembesaran tinggi" },
-            { question: "Tempat untuk menyimpan baju", answer: "lemari pakaian", hint: "Bisa gantung atau lipat" },
-            { question: "Alat untuk mengukur kecepatan angin", answer: "anemometer", hint: "Ada baling-baling" },
-            { question: "Binatang yang bisa berkamuflase", answer: "bunglon", hint: "Bisa berubah warna" },
-            { question: "Buah yang bisa dijadikan kismis", answer: "anggur", hint: "Dikeringkan" },
-            { question: "Tempat untuk bermain badminton", answer: "lapangan badminton", hint: "Sama dengan bulu tangkis" },
-            { question: "Alat untuk mengukur kadar gula darah", answer: "glucometer", hint: "Untuk penderita diabetes" },
-            { question: "Warna bendera Indonesia", answer: "merah putih", hint: "Dua warna" },
-            { question: "Satuan resistensi listrik", answer: "ohm", hint: "Hukum Ohm" },
-            { question: "Tempat untuk beribadah umat Konghucu", answer: "kelenteng", hint: "Banyak lampion" },
-            { question: "Alat transportasi air tradisional", answer: "perahu layar", hint: "Menggunakan angin" },
-            { question: "Minuman dari biji kopi tanpa kafein", answer: "kopi decaf", hint: "Tanpa efek stimulan" },
-            { question: "Benda untuk mengukur tinggi badan", answer: "pengukur tinggi", hint: "Biasa di dinding" },
-            { question: "Tempat untuk menyimpan dokumen", answer: "filing cabinet", hint: "Bisa beberapa laci" },
-            { question: "Alat untuk mengukur radiasi", answer: "geiger counter", hint: "Untuk nuklir" },
-            { question: "Binatang yang bisa menirukan suara", answer: "beo", hint: "Burung yang pandai bicara" },
-            { question: "Buah yang bisa dijadikan selai kacang", answer: "stroberi", hint: "Warna merah" },
-            { question: "Tempat untuk bermain sepak takraw", answer: "lapangan sepak takraw", hint: "Bola rotan" },
-            { question: "Alat untuk mengukur ketebalan", answer: "mikrometer", hint: "Presisi tinggi" },
-            { question: "Warna bendera Jepang", answer: "putih merah", hint: "Lingkaran merah" },
-            { question: "Satuan kapasitansi", answer: "farad", hint: "Untuk kapasitor" },
-            { question: "Tempat untuk beribadah umat Sikh", answer: "gurdwara", hint: "Dari India" },
-            { question: "Alat transportasi udara tanpa awak", answer: "drone", hint: "Bisa dikendalikan jarak jauh" },
-            { question: "Makanan dari kedelai yang difermentasi", answer: "tahu", hint: "Lunak dan putih" },
-            { question: "Benda untuk melihat planet", answer: "teleskop", hint: "Astronomi" },
-            { question: "Tempat untuk menyimpan perhiasan", answer: "kotak perhiasan", hint: "Kecil dan berharga" },
-            { question: "Alat untuk mengukur kekuatan magnet", answer: "magnetometer", hint: "Untuk medan magnet" },
-            { question: "Binatang yang bisa berjalan di dinding", answer: "cicak", hint: "Bisa memutuskan ekor" },
-            { question: "Buah yang bisa dijadikan acar", answer: "mentimun", hint: "Hijau panjang" },
-            { question: "Tempat untuk bermain bowling", answer: "arena bowling", hint: "Ada pin dan bola" },
-            { question: "Alat untuk mengukur viskositas", answer: "viskometer", hint: "Untuk kekentalan" },
-            { question: "Warna bendera Amerika", answer: "merah putih biru", hint: "Bintang dan garis" },
-            { question: "Satuan induktansi", answer: "henry", hint: "Untuk kumparan" },
-            { question: "Tempat untuk beribadah umat Yahudi", answer: "sinagog", hint: "Agama Yahudi" },
-            { question: "Alat transportasi air cepat", answer: "jet ski", hint: "Untuk satu orang" },
-            { question: "Minuman dari fermentasi beras", answer: "sake", hint: "Dari Jepang" },
-            { question: "Benda untuk mengukur kelembaban tanah", answer: "soil moisture meter", hint: "Untuk pertanian" },
-            { question: "Tempat untuk menyimpan arsip", answer: "arsip", hint: "Dokumen penting" },
-            { question: "Alat untuk mengukur kekuatan sinyal", answer: "signal meter", hint: "Untuk telekomunikasi" },
-            { question: "Binatang yang bisa berjalan di air", answer: "kadal basilisk", hint: "Juga disebut Jesus lizard" },
-            { question: "Buah yang bisa dijadikan chutney", answer: "mangga", hint: "Asam manis" },
-            { question: "Tempat untuk bermain biliar", answer: "meja biliar", hint: "Dengan bola dan stik" },
-            { question: "Alat untuk mengukur kadar oksigen", answer: "oximeter", hint: "Dipasang di jari" },
-            { question: "Warna bendera Inggris", answer: "merah putih biru", hint: "Union Jack" },
-            { question: "Satuan fluks magnet", answer: "weber", hint: "Untuk medan magnet" },
-            { question: "Tempat untuk beribadah umat Tao", answer: "kuil tao", hint: "Dari Cina" },
-            { question: "Alat transportasi udara bertenaga manusia", answer: "hang glider", hint: "Melayang di udara" },
-            { question: "Makanan dari tepung yang dikukus", answer: "bakpao", hint: "Biasa isi daging" },
-            { question: "Benda untuk melihat bakteri", answer: "mikroskop elektron", hint: "Pembesaran sangat tinggi" },
-            { question: "Tempat untuk menyimpan uang di bank", answer: "safe deposit box", hint: "Untuk barang berharga" },
-            { question: "Alat untuk mengukur radiasi matahari", answer: "piranometer", hint: "Untuk energi surya" },
-            { question: "Binatang yang bisa berubah bentuk", answer: "gurita", hint: "Hidup di laut" },
-            { question: "Buah yang bisa dijadikan asinan", answer: "kedondong", hint: "Asam segar" },
-            { question: "Tempat untuk bermain dart", answer: "papan dart", hint: "Dengan lingkaran konsentris" },
-            { question: "Alat untuk mengukur kadar karbon dioksida", answer: "capnometer", hint:
+        // Data level game
+        let gameData = {
+            currentLevel: 1,
+            score: 0,
+            levels: [
+                // Level 1-30 akan diisi atau diambil dari localStorage
+            ],
+            defaultLevels: [
+                {
+                    question: "Binatang yang dikenal sebagai raja hutan?",
+                    answer: "singa",
+                    hint: "Berkelompok disebut 'pride'"
+                },
+                {
+                    question: "Ibu kota Indonesia?",
+                    answer: "jakarta",
+                    hint: "Terletak di pulau Jawa"
+                },
+                {
+                    question: "Warna yang dihasilkan dari campuran merah dan biru?",
+                    answer: "ungu",
+                    hint: "Warna kerajaan"
+                },
+                {
+                    question: "Planet terdekat dari matahari?",
+                    answer: "merkurius",
+                    hint: "Nama dewa Romawi"
+                },
+                {
+                    question: "Alat untuk melihat bintang dan planet?",
+                    answer: "teleskop",
+                    hint: "Ditemukan oleh Galileo"
+                },
+                {
+                    question: "Buah yang memiliki kulit berduri?",
+                    answer: "durian",
+                    hint: "Raja buah"
+                },
+                {
+                    question: "Negara terbesar di dunia?",
+                    answer: "rusia",
+                    hint: "Terletak di dua benua"
+                },
+                {
+                    question: "Lambang kimia untuk emas?",
+                    answer: "au",
+                    hint: "Dari bahasa Latin 'aurum'"
+                },
+                {
+                    question: "Satelit alami bumi?",
+                    answer: "bulan",
+                    hint: "Mempengaruhi pasang surut"
+                },
+                {
+                    question: "Penemu lampu pijar?",
+                    answer: "thomas edison",
+                    hint: "Juga menemukan fonograf"
+                },
+                {
+                    question: "Hewan terbesar di dunia?",
+                    answer: "paus biru",
+                    hint: "Hidup di laut"
+                },
+                {
+                    question: "Zat yang membuat daun hijau?",
+                    answer: "klorofil",
+                    hint: "Untuk fotosintesis"
+                },
+                {
+                    question: "Benua terkecil di dunia?",
+                    answer: "australia",
+                    hint: "Juga nama negara"
+                },
+                {
+                    question: "Ibukota Prancis?",
+                    answer: "paris",
+                    hint: "Menara Eiffel"
+                },
+                {
+                    question: "Penulis novel Harry Potter?",
+                    answer: "jk rowling",
+                    hint: "Penulis wanita Inggris"
+                },
+                {
+                    question: "Lawan kata dari siang?",
+                    answer: "malam",
+                    hint: "Waktu untuk tidur"
+                },
+                {
+                    question: "Pegunungan tertinggi di dunia?",
+                    answer: "himalaya",
+                    hint: "Ada Gunung Everest"
+                },
+                {
+                    question: "Benda untuk memotong kertas?",
+                    answer: "gunting",
+                    hint: "Dua bilah logam"
+                },
+                {
+                    question: "Warna pelangi yang pertama?",
+                    answer: "merah",
+                    hint: "Panjang gelombang terpanjang"
+                },
+                {
+                    question: "Alat untuk mengukur suhu?",
+                    answer: "termometer",
+                    hint: "Bisa berisi air raksa"
+                },
+                {
+                    question: "Planet terbesar di tata surya?",
+                    answer: "jupiter",
+                    hint: "Memiliki bintik merah besar"
+                },
+                {
+                    question: "Ikan yang bisa berjalan di darat?",
+                    answer: "ikan lele",
+                    hint: "Memiliki kumis"
+                },
+                {
+                    question: "Bahan utama pembuatan kaca?",
+                    answer: "pasir",
+                    hint: "Ditemukan di pantai"
+                },
+                {
+                    question: "Hewan yang bisa mengubah warna kulit?",
+                    answer: "bunglon",
+                    hint: "Reptil kecil"
+                },
+                {
+                    question: "Negara dengan populasi terbanyak?",
+                    answer: "china",
+                    hint: "Tembok besar"
+                },
+                {
+                    question: "Buah dengan biji di luar?",
+                    answer: "strawberry",
+                    hint: "Warna merah"
+                },
+                {
+                    question: "Alat musik petik dari Hawaii?",
+                    answer: "ukulele",
+                    hint: "Seperti gitar kecil"
+                },
+                {
+                    question: "Pencipta teori relativitas?",
+                    answer: "albert einstein",
+                    hint: "Rumus E=mc²"
+                },
+                {
+                    question: "Sungai terpanjang di dunia?",
+                    answer: "sungai nil",
+                    hint: "Di Mesir"
+                },
+                {
+                    question: "Satuan ukuran untuk daya komputer?",
+                    answer: "bit",
+                    hint: "Binary digit"
+                }
+            ]
+        };
+
+        // DOM Elements
+        const currentLevelEl = document.getElementById('current-level');
+        const totalLevelsEl = document.getElementById('total-levels');
+        const scoreEl = document.getElementById('score');
+        const questionEl = document.getElementById('question');
+        const answerInputEl = document.getElementById('answer-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const hintBtn = document.getElementById('hint-btn');
+        const hintContainerEl = document.getElementById('hint-container');
+        const hintTextEl = document.getElementById('hint-text');
+        const levelCompleteEl = document.getElementById('level-complete');
+        const correctAnswerEl = document.getElementById('correct-answer');
+        const nextLevelBtn = document.getElementById('next-level-btn');
+        const gameCompleteEl = document.getElementById('game-complete');
+        const finalScoreEl = document.getElementById('final-score');
+        const restartGameBtn = document.getElementById('restart-game-btn');
+        const adminPanelEl = document.getElementById('admin-panel');
+        const toggleAdminBtn = document.getElementById('toggle-admin');
+        const adminLevelEl = document.getElementById('admin-level');
+        const adminQuestionEl = document.getElementById('admin-question');
+        const adminAnswerEl = document.getElementById('admin-answer');
+        const adminHintEl = document.getElementById('admin-hint');
+        const addLevelBtn = document.getElementById('add-level-btn');
+        const updateLevelBtn = document.getElementById('update-level-btn');
+        const resetGameBtn = document.getElementById('reset-game-btn');
+
+        // Initialize game
+        function initGame() {
+            // Load game data from localStorage or use default
+            const savedData = localStorage.getItem('tebakKataGame');
+            if (savedData) {
+                gameData = JSON.parse(savedData);
+                
+                // Jika levels kosong, gunakan default
+                if (gameData.levels.length === 0) {
+                    gameData.levels = [...gameData.defaultLevels];
+                }
+            } else {
+                gameData.levels = [...gameData.defaultLevels];
+                saveGameData();
+            }
+            
+            // Set current level and score
+            gameData.currentLevel = parseInt(localStorage.getItem('tebakKataCurrentLevel')) || 1;
+            gameData.score = parseInt(localStorage.getItem('tebakKataScore')) || 0;
+            
+            // Update UI
+            updateUI();
+            loadLevel(gameData.currentLevel);
+        }
+
+        // Save game data to localStorage
+        function saveGameData() {
+            localStorage.setItem('tebakKataGame', JSON.stringify(gameData));
+            localStorage.setItem('tebakKataCurrentLevel', gameData.currentLevel);
+            localStorage.setItem('tebakKataScore', gameData.score);
+        }
+
+        // Update UI elements
+        function updateUI() {
+            currentLevelEl.textContent = gameData.currentLevel;
+            totalLevelsEl.textContent = gameData.levels.length;
+            scoreEl.textContent = gameData.score;
+        }
+
+        // Load level
+        function loadLevel(level) {
+            if (level > gameData.levels.length) {
+                showGameComplete();
+                return;
+            }
+            
+            const levelData = gameData.levels[level - 1];
+            questionEl.textContent = levelData.question;
+            answerInputEl.value = '';
+            hintContainerEl.style.display = 'none';
+            levelCompleteEl.style.display = 'none';
+            gameCompleteEl.style.display = 'none';
+            
+            // Focus on input
+            answerInputEl.focus();
+        }
+
+        // Check answer
+        function checkAnswer() {
+            const userAnswer = answerInputEl.value.trim().toLowerCase();
+            const correctAnswer = gameData.levels[gameData.currentLevel - 1].answer.toLowerCase();
+            
+            if (userAnswer === correctAnswer) {
+                // Correct answer
+                gameData.score += 10;
+                saveGameData();
+                updateUI();
+                showLevelComplete(correctAnswer);
+                
+                // Add confetti effect
+                createConfetti();
+            } else {
+                // Wrong answer
+                answerInputEl.classList.add('shake');
+                setTimeout(() => {
+                    answerInputEl.classList.remove('shake');
+                }, 500);
+                
+                // Deduct points only if score is more than 0
+                if (gameData.score > 0) {
+                    gameData.score -= 2;
+                    saveGameData();
+                    updateUI();
+                }
+            }
+        }
+
+        // Show level complete
+        function showLevelComplete(correctAnswer) {
+            correctAnswerEl.textContent = correctAnswer;
+            levelCompleteEl.style.display = 'block';
+            questionEl.classList.add('bounce');
+        }
+
+        // Show game complete
+        function showGameComplete() {
+            finalScoreEl.textContent = gameData.score;
+            gameCompleteEl.style.display = 'block';
+            questionEl.classList.add('bounce');
+            
+            // Add more confetti
+            for (let i = 0; i < 50; i++) {
+                createConfetti();
+            }
+        }
+
+        // Create confetti effect
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = getRandomColor();
+            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, 3000);
+        }
+
+        // Get random color for confetti
+        function getRandomColor() {
+            const colors = ['#6e45e2', '#88d3ce', '#ff7e5f', '#ffd166', '#06d6a0', '#118ab2'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Next level
+        function nextLevel() {
+            gameData.currentLevel++;
+            saveGameData();
+            updateUI();
+            loadLevel(gameData.currentLevel);
+            questionEl.classList.remove('bounce');
+        }
+
+        // Restart game
+        function restartGame() {
+            gameData.currentLevel = 1;
+            gameData.score = 0;
+            saveGameData();
+            updateUI();
+            loadLevel(gameData.currentLevel);
+            questionEl.classList.remove('bounce');
+        }
+
+        // Show hint
+        function showHint() {
+            const hint = gameData.levels[gameData.currentLevel - 1].hint;
+            hintTextEl.textContent = hint;
+            hintContainerEl.style.display = 'block';
+            
+            // Deduct points for using hint
+            if (gameData.score > 0) {
+                gameData.score -= 5;
+                saveGameData();
+                updateUI();
+            }
+        }
+
+        // Toggle admin panel
+        function toggleAdminPanel() {
+            adminPanelEl.style.display = adminPanelEl.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Add new level
+        function addLevel() {
+            const level = parseInt(adminLevelEl.value);
+            const question = adminQuestionEl.value.trim();
+            const answer = adminAnswerEl.value.trim();
+            const hint = adminHintEl.value.trim();
+            
+            if (!question || !answer) {
+                alert('Pertanyaan dan jawaban harus diisi!');
+                return;
+            }
+            
+            const newLevel = {
+                question,
+                answer: answer.toLowerCase(),
+                hint: hint || 'Tidak ada hint tersedia'
+            };
+            
+            if (level && level <= gameData.levels.length) {
+                // Insert at specific position
+                gameData.levels.splice(level - 1, 0, newLevel);
+            } else {
+                // Add to end
+                gameData.levels.push(newLevel);
+            }
+            
+            saveGameData();
+            alert('Level berhasil ditambahkan!');
+            updateUI();
+            clearAdminForm();
+        }
+
+        // Update existing level
+        function updateLevel() {
+            const level = parseInt(adminLevelEl.value);
+            const question = adminQuestionEl.value.trim();
+            const answer = adminAnswerEl.value.trim();
+            const hint = adminHintEl.value.trim();
+            
+            if (!level || level < 1 || level > gameData.levels.length) {
+                alert('Level tidak valid!');
+                return;
+            }
+            
+            if (!question || !answer) {
+                alert('Pertanyaan dan jawaban harus diisi!');
+                return;
+            }
+            
+            gameData.levels[level - 1] = {
+                question,
+                answer: answer.toLowerCase(),
+                hint: hint || gameData.levels[level - 1].hint
+            };
+            
+            saveGameData();
+            alert(`Level ${level} berhasil diperbarui!`);
+            
+            // Jika sedang memainkan level yang diupdate, reload
+            if (gameData.currentLevel === level) {
+                loadLevel(level);
+            }
+            
+            clearAdminForm();
+        }
+
+        // Reset game to default
+        function resetGame() {
+            if (confirm('Apakah Anda yakin ingin mereset game? Semua level custom akan hilang.')) {
+                gameData.levels = [...gameData.defaultLevels];
+                gameData.currentLevel = 1;
+                gameData.score = 0;
+                saveGameData();
+                updateUI();
+                loadLevel(gameData.currentLevel);
+                alert('Game telah direset ke pengaturan awal!');
+            }
+        }
+
+        // Clear admin form
+        function clearAdminForm() {
+            adminLevelEl.value = '';
+            adminQuestionEl.value = '';
+            adminAnswerEl.value = '';
+            adminHintEl.value = '';
+        }
+
+        // Event listeners
+        submitBtn.addEventListener('click', checkAnswer);
+        answerInputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        hintBtn.addEventListener('click', showHint);
+        nextLevelBtn.addEventListener('click', nextLevel);
+        restartGameBtn.addEventListener('click', restartGame);
+        toggleAdminBtn.addEventListener('click', toggleAdminPanel);
+        addLevelBtn.addEventListener('click', addLevel);
+        updateLevelBtn.addEventListener('click', updateLevel);
+        resetGameBtn.addEventListener('click', resetGame);
+
+        // Initialize the game
+        initGame();
+    </script>
+</body>
+</html>
