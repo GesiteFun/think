@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Notepad Pro</title>
+    <title>✍️ Notepad Pro</title>
+    <!-- Favicon yang berubah sesuai tema -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234a90e2'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z'/></svg>">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Google Fonts - Inter -->
@@ -19,6 +21,7 @@
             --toast-bg: #4caf50;
             --error-bg: #f44336;
             --border-color: #e0e0e0;
+            --placeholder-color: #aaaaaa;
         }
 
         .dark-mode {
@@ -30,13 +33,14 @@
             --toast-bg: #2e7d32;
             --error-bg: #c62828;
             --border-color: #444444;
+            --placeholder-color: #666666;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
         }
 
         body {
@@ -51,6 +55,12 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .header {
@@ -59,6 +69,19 @@
             border-radius: 12px;
             margin-bottom: 20px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: "NOTEPAD PRO";
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 1px;
         }
 
         .note-title {
@@ -75,6 +98,7 @@
 
         .note-title::placeholder {
             color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
         }
 
         .toolbar {
@@ -95,12 +119,17 @@
             gap: 6px;
             font-size: 0.95rem;
             font-weight: 500;
+            transition: all 0.2s ease;
         }
 
         .btn:hover {
             background-color: rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .btn i {
@@ -119,11 +148,18 @@
             color: var(--text-color);
             resize: vertical;
             line-height: 1.7;
+            transition: box-shadow 0.3s ease;
         }
 
         .editor:focus {
             outline: 2px solid var(--primary-color);
             box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
+        }
+
+        .editor::placeholder {
+            color: var(--placeholder-color);
+            font-style: italic;
+            opacity: 0.7;
         }
 
         #theme-toggle {
@@ -140,10 +176,13 @@
             background-color: var(--primary-color);
             color: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
         }
 
         #theme-toggle:hover {
-            transform: scale(1.05);
+            transform: scale(1.05) rotate(10deg);
         }
 
         .toast {
@@ -160,6 +199,9 @@
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             z-index: 1000;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .toast.show {
@@ -169,6 +211,33 @@
 
         .toast.error {
             background-color: var(--error-bg);
+        }
+
+        .save-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 12px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .save-status.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .typing-effect {
+            animation: typing 0.5s ease-out;
+        }
+
+        @keyframes typing {
+            from { opacity: 0.5; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         @media (max-width: 768px) {
@@ -193,6 +262,11 @@
                 font-size: 1rem;
                 padding: 18px;
             }
+
+            .save-status {
+                top: 10px;
+                right: 10px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -210,13 +284,17 @@
                 height: 44px;
                 font-size: 1rem;
             }
+
+            .header::after {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <input type="text" class="note-title" id="noteTitle" placeholder="Judul Catatan" aria-label="Judul catatan">
+            <input type="text" class="note-title" id="noteTitle" placeholder="Beri judul catatan Anda..." aria-label="Judul catatan">
             <div class="toolbar">
                 <button class="btn" onclick="saveNote()" aria-label="Simpan catatan">
                     <i class="fas fa-save"></i>
@@ -237,13 +315,17 @@
                 </label>
             </div>
         </div>
-        <textarea class="editor" id="editor" placeholder="Ketik catatan Anda di sini... Tekan Ctrl+S untuk menyimpan" aria-label="Editor catatan"></textarea>
+        <textarea class="editor" id="editor" placeholder="Mulai mengetik di sini... ✨\n\nTips:\n- Gunakan Ctrl+S untuk menyimpan\n- Klik ikon bulan untuk tema gelap\n- Drag sudut textarea untuk mengubah ukuran" aria-label="Editor catatan"></textarea>
         <button class="btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle tema gelap/terang">
             <i class="fas fa-moon"></i>
         </button>
     </div>
 
     <div class="toast" id="toast"></div>
+    <div class="save-status" id="saveStatus">
+        <i class="fas fa-circle-notch fa-spin"></i>
+        <span>Menyimpan...</span>
+    </div>
 
     <script>
         // DOM Elements
@@ -251,6 +333,16 @@
         const editor = document.getElementById('editor');
         const themeToggle = document.getElementById('theme-toggle');
         const toast = document.getElementById('toast');
+        const saveStatus = document.getElementById('saveStatus');
+        let typingTimer;
+        let lastTitle = '';
+
+        // Update document title with note title
+        function updateDocumentTitle() {
+            const title = noteTitle.value.trim() || 'Untitled Note';
+            document.title = `${title} ✍️ Notepad Pro`;
+            return title;
+        }
 
         // Load saved note
         window.addEventListener('DOMContentLoaded', () => {
@@ -260,6 +352,7 @@
                     const { title, content } = JSON.parse(savedNote);
                     noteTitle.value = title;
                     editor.value = content;
+                    lastTitle = updateDocumentTitle();
                 } catch (e) {
                     showToast('Gagal memuat catatan', true);
                 }
@@ -270,19 +363,75 @@
             if (savedTheme === 'dark-mode') {
                 document.body.classList.add('dark-mode');
                 themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                updateFavicon(true);
             } else {
                 themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                updateFavicon(false);
             }
         });
 
+        // Update favicon based on theme
+        function updateFavicon(isDark) {
+            const color = isDark ? '6c63ff' : '4a90e2';
+            const link = document.querySelector("link[rel~='icon']");
+            link.href = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23${color}'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z'/></svg>`;
+        }
+
         // Auto-save every 3 seconds
         setInterval(() => {
-            if (validateTitle()) saveToStorage();
+            if (validateTitle()) {
+                showSavingStatus();
+                setTimeout(() => {
+                    saveToStorage();
+                    hideSavingStatus();
+                }, 500);
+            }
         }, 3000);
+
+        // Typing effect
+        editor.addEventListener('input', () => {
+            editor.classList.add('typing-effect');
+            setTimeout(() => {
+                editor.classList.remove('typing-effect');
+            }, 500);
+            
+            // Update save status
+            showSavingStatus();
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                if (validateTitle()) {
+                    saveToStorage();
+                    hideSavingStatus();
+                }
+            }, 1000);
+        });
+
+        // Title change effect
+        noteTitle.addEventListener('input', () => {
+            const newTitle = updateDocumentTitle();
+            if (newTitle !== lastTitle) {
+                noteTitle.classList.add('typing-effect');
+                setTimeout(() => {
+                    noteTitle.classList.remove('typing-effect');
+                }, 500);
+                lastTitle = newTitle;
+            }
+        });
+
+        // Show saving status
+        function showSavingStatus() {
+            saveStatus.classList.add('show');
+        }
+
+        // Hide saving status
+        function hideSavingStatus() {
+            saveStatus.classList.remove('show');
+        }
 
         // Show toast notification
         function showToast(message, isError = false) {
-            toast.textContent = message;
+            const icon = isError ? '<i class="fas fa-exclamation-circle"></i>' : '<i class="fas fa-check-circle"></i>';
+            toast.innerHTML = `${icon} <span>${message}</span>`;
             toast.className = isError ? 'toast error show' : 'toast show';
             
             setTimeout(() => {
@@ -301,8 +450,12 @@
 
         function saveNote() {
             if (!validateTitle()) return;
-            saveToStorage();
-            showToast('Catatan tersimpan!');
+            showSavingStatus();
+            setTimeout(() => {
+                saveToStorage();
+                hideSavingStatus();
+                showToast('Catatan tersimpan!');
+            }, 300);
         }
 
         function saveToStorage() {
@@ -318,6 +471,7 @@
                 noteTitle.value = '';
                 editor.value = '';
                 localStorage.removeItem('note');
+                updateDocumentTitle();
                 showToast('Catatan baru dibuat');
             }
         }
@@ -349,6 +503,7 @@
             reader.onload = (e) => {
                 editor.value = e.target.result;
                 noteTitle.value = file.name.replace('.txt', '');
+                updateDocumentTitle();
                 saveToStorage();
                 showToast('File berhasil diunggah');
             };
@@ -363,6 +518,13 @@
             const isDarkMode = document.body.classList.contains('dark-mode');
             themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
             localStorage.setItem('theme', isDarkMode ? 'dark-mode' : 'light-mode');
+            updateFavicon(isDarkMode);
+            
+            // Add animation to theme toggle
+            themeToggle.style.transform = 'scale(1.1) rotate(360deg)';
+            setTimeout(() => {
+                themeToggle.style.transform = '';
+            }, 500);
         }
 
         // Keyboard shortcuts
@@ -380,12 +542,6 @@
                 }
             }
         });
-
-        // Improved data structure for future multi-note support
-        function getNotesArray() {
-            const notes = localStorage.getItem('notes');
-            return notes ? JSON.parse(notes) : [];
-        }
     </script>
 </body>
 </html>
