@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Dark/Light Mode Toggle</title>
+    <title>Dark/Light Mode</title>
     <style>
-        /* Reset dan Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -39,7 +38,6 @@
             font-weight: 600;
         }
 
-        /* Tombol Toggle Modern */
         .toggle-container {
             position: relative;
             display: inline-block;
@@ -90,7 +88,6 @@
             background: #333;
         }
 
-        /* Ikon SVG */
         .icon {
             width: 30px;
             height: 30px;
@@ -115,7 +112,6 @@
             opacity: 1;
         }
 
-        /* Efek tambahan untuk demo */
         .content {
             max-width: 600px;
             margin: 2rem auto;
@@ -139,7 +135,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Dark/Light Mode Toggle</h1>
+        <h1>Tombol Mode Dark/Light</h1>
         
         <div class="toggle-container">
             <input type="checkbox" id="toggle" class="toggle-input">
@@ -164,8 +160,8 @@
         </div>
         
         <div class="content">
-            <p>Klik tombol di atas untuk mengubah antara mode terang dan gelap. Desain tombol ini modern dengan animasi yang halus saat transisi.</p>
-            <p>Mode gelap semakin populer karena mengurangi ketegangan mata dan menghemat daya baterai pada perangkat dengan layar OLED.</p>
+            <p>Klik tombol di atas dik buat ubah antara mode terang dan gelap.</p>
+            <p>Nanti codingannya aku kirim lewat ig atau lewat wa dik enak nya?? buat belajar.</p>
         </div>
     </div>
 
@@ -174,7 +170,6 @@
             const toggle = document.getElementById('toggle');
             const body = document.body;
             
-            // Cek preferensi sistem atau localStorage
             const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
             const currentTheme = localStorage.getItem('theme');
             
@@ -183,7 +178,6 @@
                 toggle.checked = true;
             }
             
-            // Toggle dark/light mode
             toggle.addEventListener('change', function() {
                 if (this.checked) {
                     body.classList.add('dark-mode');
@@ -194,7 +188,6 @@
                 }
             });
             
-            // Update jika preferensi sistem berubah
             prefersDarkScheme.addEventListener('change', e => {
                 if (e.matches) {
                     body.classList.add('dark-mode');
