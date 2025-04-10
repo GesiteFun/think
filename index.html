@@ -1,205 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark/Light Mode</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: background-color 0.5s ease, color 0.3s ease;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f5f5f5;
-            color: #333;
-            transition: background-color 0.5s ease;
-        }
-
-        body.dark-mode {
-            background-color: #121212;
-            color: #f5f5f5;
-        }
-
-        .container {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        h1 {
-            margin-bottom: 2rem;
-            font-weight: 600;
-        }
-
-        .toggle-container {
-            position: relative;
-            display: inline-block;
-            margin: 2rem 0;
-        }
-
-        .toggle-input {
-            display: none;
-        }
-
-        .toggle-label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            width: 120px;
-            height: 60px;
-            background: linear-gradient(145deg, #e6e6e6, #ffffff);
-            border-radius: 50px;
-            padding: 0 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .dark-mode .toggle-label {
-            background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .toggle-ball {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 50%;
-            transition: transform 0.3s ease, background-color 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .dark-mode .toggle-ball {
-            transform: translateX(60px);
-            background: #333;
-        }
-
-        .icon {
-            width: 30px;
-            height: 30px;
-            transition: opacity 0.3s ease;
-        }
-
-        .sun-icon {
-            opacity: 1;
-        }
-
-        .dark-mode .sun-icon {
-            opacity: 0;
-        }
-
-        .moon-icon {
-            position: absolute;
-            opacity: 0;
-            right: 10px;
-        }
-
-        .dark-mode .moon-icon {
-            opacity: 1;
-        }
-
-        .content {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 2rem;
-            border-radius: 15px;
-            background-color: white;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.5s ease, box-shadow 0.5s ease;
-        }
-
-        .dark-mode .content {
-            background-color: #1e1e1e;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        p {
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-    </style>
+    <title>Cryptarithm Mini Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Tombol Mode Dark/Light</h1>
-        
-        <div class="toggle-container">
-            <input type="checkbox" id="toggle" class="toggle-input">
-            <label for="toggle" class="toggle-label">
-                <div class="toggle-ball">
-                    <svg class="icon sun-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="5" stroke="#FFD700" stroke-width="2" fill="#FFD700"/>
-                        <path d="M12 1V3" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M12 21V23" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M4.22 4.22L5.64 5.64" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M18.36 18.36L19.78 19.78" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M1 12H3" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M21 12H23" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M4.22 19.78L5.64 18.36" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M18.36 5.64L19.78 4.22" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <svg class="icon moon-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 3C12 8 15 12 20 12C19 15 16 17 12 17C8 17 5 15 4 12C9 12 12 8 12 3Z" stroke="#6495ED" stroke-width="2" fill="#6495ED"/>
-                </svg>
-            </label>
-        </div>
-        
-        <div class="content">
-            <p>Klik tombol di atas dik buat ubah antara mode terang dan gelap.</p>
-            <p>Nanti codingannya aku kirim lewat ig atau lewat wa dik enak nya?? buat belajar.</p>
+    <div id="start-screen" class="screen active">
+        <h1>Cryptarithm Challenge</h1>
+        <p>Uji kecepatanmu memecahkan kode angka!</p>
+        <button id="play-button" class="btn btn-primary">Mulai Bermain</button>
+        <div class="high-score-display">
+            Skor Tertinggi: <span id="start-high-score">0</span>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggle = document.getElementById('toggle');
-            const body = document.body;
-            
-            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-            const currentTheme = localStorage.getItem('theme');
-            
-            if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
-                body.classList.add('dark-mode');
-                toggle.checked = true;
-            }
-            
-            toggle.addEventListener('change', function() {
-                if (this.checked) {
-                    body.classList.add('dark-mode');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    body.classList.remove('dark-mode');
-                    localStorage.setItem('theme', 'light');
-                }
-            });
-            
-            prefersDarkScheme.addEventListener('change', e => {
-                if (e.matches) {
-                    body.classList.add('dark-mode');
-                    toggle.checked = true;
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    body.classList.remove('dark-mode');
-                    toggle.checked = false;
-                    localStorage.setItem('theme', 'light');
-                }
-            });
-        });
-    </script>
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <div class="timer-container">
+                <span>Waktu:</span>
+                <div id="timer-progress-bg">
+                    <div id="timer-progress"></div>
+                </div>
+                <span id="timer-display">100</span>s
+            </div>
+            <div class="score-container">
+                Skor: <span id="score-display">0</span>
+            </div>
+            <div class="high-score-ingame">
+                Tertinggi: <span id="game-high-score">0</span>
+            </div>
+            <div class="combo-container">
+                 <span id="combo-display"></span>
+            </div>
+        </div>
+
+        <div id="qa-container">
+            <div id="question-container">
+                <div id="question-text">Memuat soal...</div>
+            </div>
+            <div id="feedback-text"></div>
+            <div id="answer-options">
+                </div>
+        </div>
+         <div id="loading-overlay" class="loading-overlay">
+            Memuat soal berikutnya...
+        </div>
+    </div>
+
+    <div id="game-over-screen" class="screen">
+        <h1>Waktu Habis!</h1>
+        <p>Skor Akhir Anda:</p>
+        <div id="final-score" class="final-score-display">0</div>
+        <p>Skor Tertinggi:</p>
+        <div id="end-high-score" class="high-score-display">0</div>
+        <button id="play-again-button" class="btn btn-secondary">Main Lagi</button>
+    </div>
+
+    <audio id="correct-sound" src="path/to/correct.wav" preload="auto"></audio>
+    <audio id="wrong-sound" src="path/to/wrong.wav" preload="auto"></audio>
+    <audio id="game-over-sound" src="path/to/gameover.wav" preload="auto"></audio>
+    <audio id="click-sound" src="path/to/click.wav" preload="auto"></audio>
+
+    <script src="script.js"></script>
 </body>
 </html>
