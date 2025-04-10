@@ -1,0 +1,378 @@
+/* --- Reset & Basic Setup --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    overflow: hidden; /* Mencegah scroll saat animasi */
+    perspective: 1000px; /* Untuk efek 3D jika diperlukan */
+}
+
+/* --- Screen Management --- */
+.screen {
+    display: none; /* Sembunyikan semua layar secara default */
+    position: absolute; /* Memungkinkan transisi layar */
+    width: 90%;
+    max-width: 500px;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+}
+
+.screen.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* --- Tombol --- */
+.btn {
+    display: inline-block;
+    padding: 15px 30px;
+    margin: 10px 5px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-width: 150px; /* Lebar minimum agar nyaman disentuh */
+    -webkit-tap-highlight-color: transparent; /* Hilangkan highlight biru di mobile */
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #ff8c00, #ff5f6d);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 100, 100, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, #4CAF50, #8BC34A);
+    color: white;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Layar Awal --- */
+#start-screen h1 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    color: #f0e68c; /* Khaki */
+}
+#start-screen p {
+    font-size: 1.2em;
+    margin-bottom: 25px;
+}
+.high-score-display {
+    margin-top: 20px;
+    font-size: 1.1em;
+    color: #eee;
+}
+#start-high-score {
+    font-weight: bold;
+    color: #ffd700; /* Gold */
+}
+
+
+/* --- Layar Permainan --- */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap; /* Agar responsif */
+    gap: 10px; /* Jarak antar item header */
+    font-size: 1.1em;
+}
+
+.timer-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+#timer-progress-bg {
+    width: 80px;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#timer-progress {
+    height: 100%;
+    width: 100%; /* Dimulai penuh */
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    border-radius: 5px;
+    transition: width 0.5s linear; /* Transisi halus untuk progress bar */
+}
+
+.score-container, .high-score-ingame {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+#score-display, #timer-display, #game-high-score {
+    font-weight: bold;
+    color: #ffd700; /* Gold */
+    min-width: 30px; /* Agar layout stabil saat angka berubah */
+    display: inline-block;
+    text-align: right;
+}
+
+.combo-container {
+    position: absolute;
+    top: 80px; /* Sesuaikan posisi */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #ff8c00; /* Dark Orange */
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.combo-container.show {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.1);
+}
+
+#qa-container {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    min-height: 250px; /* Jaga ketinggian container */
+    position: relative; /* Untuk transisi */
+    overflow: hidden; /* Untuk transisi slide */
+    transition: background-color 0.3s; /* Transisi warna feedback */
+}
+
+/* Transisi Soal */
+#question-container {
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    margin-bottom: 20px;
+}
+
+#question-container.fade-out {
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+#question-container.fade-in {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+#question-text {
+    font-size: 1.8em; /* Ukuran lebih besar untuk soal */
+    font-weight: bold;
+    margin-bottom: 15px;
+    min-height: 60px; /* Beri ruang agar layout tidak lompat */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #f0e68c; /* Khaki */
+}
+
+#feedback-text {
+    min-height: 25px;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    transition: opacity 0.3s;
+    opacity: 0;
+}
+#feedback-text.show {
+    opacity: 1;
+}
+#feedback-text.correct {
+    color: #90ee90; /* Light Green */
+}
+#feedback-text.wrong {
+    color: #ff6b6b; /* Light Red */
+}
+
+
+#answer-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Grid responsif */
+    gap: 10px;
+    margin-top: 20px;
+     transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+#answer-options.fade-out {
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+#answer-options.fade-in {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.answer-option {
+    background: linear-gradient(45deg, #00bcd4, #009688);
+    color: white;
+    padding: 15px; /* Padding lebih besar */
+    font-size: 1.2em; /* Font lebih besar */
+}
+
+.answer-option:hover {
+    background: linear-gradient(45deg, #00acc1, #00796b);
+}
+
+/* Efek Visual Jawaban */
+@keyframes glow-correct {
+    0%, 100% { box-shadow: 0 0 5px #90ee90, 0 0 10px #90ee90; }
+    50% { box-shadow: 0 0 15px #90ee90, 0 0 25px #90ee90; }
+}
+@keyframes shake-wrong {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(8px); }
+    75% { transform: translateX(-8px); }
+}
+
+.correct-answer-effect {
+    animation: glow-correct 0.5s ease-out;
+    background: #2e7d32 !important; /* Warna hijau tua saat benar */
+}
+
+.wrong-answer-effect {
+    animation: shake-wrong 0.4s ease-in-out;
+    background: #c62828 !important; /* Warna merah tua saat salah */
+}
+
+#qa-container.flash-red {
+    background-color: rgba(255, 0, 0, 0.3);
+}
+
+/* Animasi Skor (ditrigger oleh JS nanti) */
+@keyframes count-up-animation {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(1.5); opacity: 0.5; }
+}
+
+.score-popup {
+    position: absolute;
+    top: 45%; /* Sesuaikan posisi agar dekat skor */
+    right: 10%;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #ffd700;
+    animation: count-up-animation 0.5s ease-out forwards;
+    pointer-events: none; /* Agar tidak mengganggu klik */
+}
+
+
+/* Loading Overlay */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    border-radius: 10px; /* Samakan dengan qa-container */
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.loading-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* --- Layar Game Over --- */
+#game-over-screen h1 {
+    font-size: 2.8em;
+    color: #ff6b6b; /* Light Red */
+    margin-bottom: 15px;
+}
+.final-score-display {
+    font-size: 3em;
+    font-weight: bold;
+    color: #ffd700; /* Gold */
+    margin: 10px 0 20px 0;
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 600px) {
+    body {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        align-items: flex-start; /* Agar tidak terpotong di bawah */
+        min-height: calc(100vh - 40px); /* Sesuaikan tinggi */
+    }
+    .screen {
+        width: 95%;
+        padding: 20px;
+        max-width: none;
+    }
+    #start-screen h1 {
+        font-size: 2em;
+    }
+     #game-over-screen h1 {
+        font-size: 2.2em;
+    }
+    .final-score-display {
+        font-size: 2.5em;
+    }
+    .btn {
+        padding: 12px 25px;
+        font-size: 1em;
+        min-width: 120px;
+    }
+     #question-text {
+        font-size: 1.5em; /* Kecilkan font soal */
+         min-height: 50px;
+    }
+    .answer-option {
+        font-size: 1.1em;
+        padding: 12px;
+    }
+    .game-header {
+        font-size: 1em;
+        justify-content: space-around; /* Atur ulang di mobile */
+    }
+     .combo-container {
+        top: 90px; /* Sesuaikan lagi */
+        font-size: 1.3em;
+    }
+}
+
